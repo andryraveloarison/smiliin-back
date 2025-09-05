@@ -3,10 +3,15 @@ import { AuthService } from './auth.service';
 import { JwtAuthGuard } from '../../guards/auth.guard';
 import { LoginDto } from './dto/login.dto';
 import { Request } from 'express';
+import { UserService } from '../user/user.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userService: UserService
+  )
+     {}
 
   @Post('login')
   async login(@Body() dto: LoginDto) {
@@ -15,8 +20,10 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('me')
-  me(@Req() request: Request) {
+  async me(@Req() request: Request) {
     // request.user est défini par le JwtAuthGuard
-    return { user: request.user };
+        const user = await this.userService.findOne(request.user.id);
+
+    return { user };
   }
 }

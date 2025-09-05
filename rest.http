@@ -1,0 +1,121 @@
+### ==========================
+### USERS
+### ==========================
+
+# ➡️ CREATE USER (avec logo upload si besoin)
+POST http://localhost:3000/users
+Content-Type: application/json
+
+{
+  "name": "Andry Raveloarison",
+  "email": "andryowe@example.com",
+  "code": "123456",
+  "role": "client"
+}
+
+###
+
+# ➡️ GET ALL USERS (admin only)
+GET http://localhost:3000/users
+
+###
+
+# ➡️ GET USER BY ID
+GET http://localhost:3000/users/{{userId}}
+
+###
+
+# ➡️ GET USER BY EMAIL
+GET http://localhost:3000/users/by-email/andryowe@example.com
+
+###
+
+# ➡️ UPDATE USER
+PUT http://localhost:3000/users/{{userId}}
+Content-Type: application/json
+
+{
+  "name": "Andry Updated",
+  "role": "admin"
+}
+
+###
+
+# ➡️ DELETE USER
+DELETE http://localhost:3000/users/{{userId}}
+
+
+
+
+
+### ==========================
+### PUBLICATIONS
+### ==========================
+
+# ➡️ CREATE PUBLICATION (sans image)
+POST http://localhost:3000/publications
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "title": "Ma première publication",
+  "description": "Voici une description de test",
+  "lien": "https://example.com",
+  "status": "En attente"
+}
+
+###
+
+# ➡️ CREATE PUBLICATION (avec images - multipart)
+POST http://localhost:3000/publications
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary
+
+------WebKitFormBoundary
+Content-Disposition: form-data; name="userId"
+
+{{userId}}
+------WebKitFormBoundary
+Content-Disposition: form-data; name="title"
+
+Publication avec images
+------WebKitFormBoundary
+Content-Disposition: form-data; name="description"
+
+Ceci est une publication test avec images
+------WebKitFormBoundary
+Content-Disposition: form-data; name="images"; filename="image1.png"
+Content-Type: image/png
+
+< ./tests/image1.png
+------WebKitFormBoundary
+Content-Disposition: form-data; name="images"; filename="image2.jpg"
+Content-Type: image/jpeg
+
+< ./tests/image2.jpg
+------WebKitFormBoundary--
+
+###
+
+# ➡️ GET ALL PUBLICATIONS
+GET http://localhost:3000/publications
+
+###
+
+# ➡️ GET ONE PUBLICATION
+GET http://localhost:3000/publications/{{publicationId}}
+
+###
+
+# ➡️ UPDATE PUBLICATION
+PUT http://localhost:3000/publications/{{publicationId}}
+Content-Type: application/json
+
+{
+  "title": "Titre modifié",
+  "status": "Publié"
+}
+
+###
+
+# ➡️ DELETE PUBLICATION
+DELETE http://localhost:3000/publications/{{publicationId}}

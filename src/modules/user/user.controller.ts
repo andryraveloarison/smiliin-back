@@ -2,6 +2,8 @@ import {
   Controller, 
   Get, 
   Post, 
+  Put, 
+  Delete, 
   Body, 
   Param, 
   Query, 
@@ -13,6 +15,7 @@ import {
 import { UserService } from './user.service';
 import { User } from './schema/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { AdminGuard } from '../../guards/admin.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileService } from '../../utils/file.service';
@@ -24,7 +27,7 @@ export class UserController {
     private readonly fileService: FileService,
   ) {}
 
-  // ➡️ Créer un user
+  // ➡️ CREATE
   @Post()
   @UseInterceptors(FileInterceptor('logo'))
   async create(
@@ -42,14 +45,14 @@ export class UserController {
     return this.usersService.create(createUserDto);
   }
 
-  // ➡️ Récupérer tous les users (admin only)
+  // ➡️ READ ALL (admin only)
   @UseGuards(AdminGuard)
   @Get()
   async findAll(): Promise<User[]> {
     return this.usersService.findAll();
   }
 
-  // ➡️ Récupérer un user par son ID
+  // ➡️ READ ONE BY ID
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<User> {
     const user = await this.usersService.findOne(id);
@@ -57,11 +60,40 @@ export class UserController {
     return user;
   }
 
-  // ➡️ Récupérer un user par son email
+  // ➡️ READ ONE BY EMAIL
   @Get('by-email/:email')
   async findByEmail(@Param('email') email: string): Promise<User> {
     const user = await this.usersService.findByEmail(email);
     if (!user) throw new NotFoundException(`User with email ${email} not found`);
     return user;
+  }
+
+  // ➡️ UPDATE
+  @Put(':id')
+  @UseInterceptors(FileInterceptor('logo'))
+  async update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    if (file) {
+      const publicUrl = await this.fileService.uploadFile(
+        file.buffer,
+        file.originalname,
+        'logo',
+      );
+      updateUserDto.logo = publicUrl;
+    }
+    const updatedUser = await this.usersService.update(id, updateUserDto);
+    if (!updatedUser) throw new NotFoundException(`User with id ${id} not found`);
+    return updatedUser;
+  }
+
+  // ➡️ DELETE
+  @Delete(':id')
+  async remove(@Param('id') id: string): Promise<{ deleted: boolean }> {
+    const deletedUser = await this.usersService.delete(id);
+    if (!deletedUser) throw new NotFoundException(`User with id ${id} not found`);
+    return deletedUser;
   }
 }
