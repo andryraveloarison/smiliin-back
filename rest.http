@@ -70,30 +70,6 @@ Content-Type: application/json
 POST http://localhost:3000/publications
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary
 
-------WebKitFormBoundary
-Content-Disposition: form-data; name="userId"
-
-{{userId}}
-------WebKitFormBoundary
-Content-Disposition: form-data; name="title"
-
-Publication avec images
-------WebKitFormBoundary
-Content-Disposition: form-data; name="description"
-
-Ceci est une publication test avec images
-------WebKitFormBoundary
-Content-Disposition: form-data; name="images"; filename="image1.png"
-Content-Type: image/png
-
-< ./tests/image1.png
-------WebKitFormBoundary
-Content-Disposition: form-data; name="images"; filename="image2.jpg"
-Content-Type: image/jpeg
-
-< ./tests/image2.jpg
-------WebKitFormBoundary--
-
 ###
 
 # ➡️ GET ALL PUBLICATIONS
@@ -119,3 +95,15 @@ Content-Type: application/json
 
 # ➡️ DELETE PUBLICATION
 DELETE http://localhost:3000/publications/{{publicationId}}
+
+
+
+
+GET PUBLICATION BY USER BY MONTH
+
+http://localhost:3000/publications/user/68b971f5cd035452fa8b8c66/month/2025/6
+
+
+GET PUBLICATION BY USER LAST 10 MONTH
+
+http://localhost:3000/publications/user/68b971f5cd035452fa8b8c66/monthly

@@ -8,8 +8,6 @@ type Folder = 'logo' | 'idee' | 'post';
 export class FileService {
   private supabase: SupabaseClient;
 
-  
-
   constructor() {
 
     this.supabase = createClient(

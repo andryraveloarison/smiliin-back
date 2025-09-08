@@ -5,7 +5,6 @@ import { Publication, PublicationDocument } from './schema/publication.schema';
 import { CreatePublicationDto } from './dto/create-publication.dto';
 import { UpdatePublicationDto } from './dto/update-publication.dto';
 import { startOfMonth, subMonths } from 'date-fns';
-import { Types } from 'mongoose';
 
 @Injectable()
 export class PublicationService {
