@@ -6,6 +6,7 @@ import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { PublicationModule } from './modules/publication/publication.module';
 import { CategoriesModule } from './modules/categorie/categorie.module';
+import { IdeaModule } from './modules/idea/idea.module';
 
 @Module({
   imports: [
@@ -13,7 +14,8 @@ import { CategoriesModule } from './modules/categorie/categorie.module';
     UserModule,
     AuthModule,
     PublicationModule,
-    CategoriesModule
+    CategoriesModule,
+    IdeaModule
   ],
   controllers: [AppController],
   providers: [AppService],
