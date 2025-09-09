@@ -5,6 +5,8 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { ResponseInterceptor } from './interceptors/response.interceptor';
 import { AllExceptionsFilter } from './filters/all-exceptions.filter';
 import * as morgan from 'morgan';
+import { AuditInterceptor } from './interceptors/audit.interceptor';
+import { AuditService } from './modules/audit/audit.service';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -22,6 +24,8 @@ async function bootstrap() {
   app.use(morgan('combined'));
 
   app.useGlobalInterceptors(new ResponseInterceptor());
+  const auditService = app.get(AuditService);
+  app.useGlobalInterceptors(new AuditInterceptor(auditService));
   app.useGlobalFilters(new AllExceptionsFilter());
   app.useGlobalPipes(new ValidationPipe());
 

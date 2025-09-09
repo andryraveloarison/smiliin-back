@@ -7,6 +7,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { PublicationModule } from './modules/publication/publication.module';
 import { CategoriesModule } from './modules/categorie/categorie.module';
 import { IdeaModule } from './modules/idea/idea.module';
+import { AuditModule } from './modules/audit/audit.module';
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import { IdeaModule } from './modules/idea/idea.module';
     AuthModule,
     PublicationModule,
     CategoriesModule,
-    IdeaModule
+    IdeaModule,
+    AuditModule
   ],
   controllers: [AppController],
   providers: [AppService],

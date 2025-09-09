@@ -1,5 +1,8 @@
+// src/publication/schemas/publication.schema.ts
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import { AuditLog } from '../../audit/schema/audit-log.schema';
+import { User } from '../../user/schema/user.schema';
 
 export type PublicationDocument = Publication & Document;
 
@@ -26,9 +29,8 @@ export class Publication {
   })
   status: string;
 
-  // ✅ Date à laquelle la publication doit être publiée
   @Prop()
-  publishDate?: Date; 
+  publishDate?: Date;
 }
 
 export const PublicationSchema = SchemaFactory.createForClass(Publication);
@@ -36,6 +38,15 @@ export const PublicationSchema = SchemaFactory.createForClass(Publication);
 // Virtual id
 PublicationSchema.virtual('id').get(function (this: PublicationDocument) {
   return (this._id as Types.ObjectId).toHexString();
+});
+
+// Virtual lastModified
+PublicationSchema.virtual('lastModified', {
+  ref: 'AuditLog',
+  localField: '_id',
+  foreignField: 'entityId',
+  justOne: true,
+  options: { sort: { createdAt: -1 } }, // prend la dernière modification
 });
 
 // JSON clean

@@ -14,15 +14,30 @@ export class PublicationService {
 
   async create(dto: CreatePublicationDto): Promise<Publication> {
     const newPub = new this.pubModel(dto);
+
     return newPub.save();
   }
 
   async findAll(): Promise<Publication[]> {
-    return this.pubModel.find().populate('userId', 'id name email').exec();
+    return this.pubModel.find().populate('userId', 'id name email').populate({
+      path: 'lastModified',
+      select: 'action createdAt', // info de l'audit
+      populate: {
+        path: 'user',           // populate le user de l'audit
+        select: 'email name',   // récupère email et nom
+      },
+    }).exec();
   }
 
   async findOne(id: string): Promise<Publication> {
-    const pub = await this.pubModel.findById(id).exec();
+    const pub = await this.pubModel.findById(id).populate({
+      path: 'lastModified',
+      select: 'action createdAt', // info de l'audit
+      populate: {
+        path: 'user',           // populate le user de l'audit
+        select: 'email name',   // récupère email et nom
+      },
+    }).exec();
     if (!pub) throw new NotFoundException(`Publication with id ${id} not found`);
     return pub;
   }
