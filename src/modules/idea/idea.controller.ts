@@ -9,11 +9,13 @@ import {
     Param,
     UploadedFiles,
     UseInterceptors,
+    UseGuards,
   } from '@nestjs/common';
   import { FileFieldsInterceptor } from '@nestjs/platform-express';
   import { IdeaService } from './idea.service';
   import { Idea } from './schema/idea.schema';
   import { FileService } from '../../utils/file.service';
+import { JwtAuthGuard } from 'src/guards/auth.guard';
   
   @Controller('ideas')
   export class IdeaController {
@@ -23,6 +25,7 @@ import {
     ) {}
   
     // CREATE (upload une ou plusieurs images)
+    @UseGuards(JwtAuthGuard) // ✅ Protection par token
     @Post()
     @UseInterceptors(FileFieldsInterceptor([{ name: 'images', maxCount: 5 }]))
     async create(
