@@ -21,10 +21,10 @@ export class PublicationService {
   async findAll(): Promise<Publication[]> {
     return this.pubModel.find().populate('userId', 'id name email').populate({
       path: 'lastModified',
-      select: 'action createdAt', // info de l'audit
+      select: 'action createdAt', 
       populate: {
-        path: 'user',           // populate le user de l'audit
-        select: 'email name logo',   // récupère email et nom
+        path: 'user',           
+        select: 'email name logo',   
       },
     }).exec();
   }
@@ -32,10 +32,10 @@ export class PublicationService {
   async findOne(id: string): Promise<Publication> {
     const pub = await this.pubModel.findById(id).populate({
       path: 'lastModified',
-      select: 'action createdAt', // info de l'audit
+      select: 'action createdAt', 
       populate: {
-        path: 'user',           // populate le user de l'audit
-        select: 'email name logo',   // récupère email et nom
+        path: 'user',           
+        select: 'email name logo',   
       },
     }).exec();
     if (!pub) throw new NotFoundException(`Publication with id ${id} not found`);
@@ -92,7 +92,8 @@ export class PublicationService {
                 status: '$$pub.status',
                 publishDate: '$$pub.publishDate',
                 createdAt: '$$pub.createdAt',
-                updatedAt: '$$pub.updatedAt'
+                updatedAt: '$$pub.updatedAt',
+                lien: '$$pub.lien'
               }
             }
           }
