@@ -18,24 +18,24 @@ export class DescenteService {
   async getDescentes(): Promise<Descente[]> {
     return this.descenteModel
       .find()
-      .populate('userId', 'email name')
-      .populate('clientId', 'email name')
+      .populate('userId', 'email name logo')
+      .populate('clientId', 'email name logo')
       .exec();
   }
 
   async getDescenteById(id: string): Promise<Descente> {
     return this.descenteModel
       .findById(id)
-      .populate('userId', 'email name')
-      .populate('clientId', 'email name')
+      .populate('userId', 'email name logo')
+      .populate('clientId', 'email name logo')
       .exec();
   }
 
   async updateDescente(id: string, data: Partial<Descente>): Promise<Descente> {
     return this.descenteModel
       .findByIdAndUpdate(id, data, { new: true })
-      .populate('userId', 'email name')
-      .populate('clientId', 'email name')
+      .populate('userId', 'email name logo')
+      .populate('clientId', 'email name logo')
       .exec();
   }
 }

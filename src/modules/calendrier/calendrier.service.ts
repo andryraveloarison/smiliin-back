@@ -68,7 +68,6 @@ export class CalendrierService {
       'publishDate',
     );
 
-
   
     const descentes = this.formatEvents(
       await this.descenteModel
@@ -92,7 +91,7 @@ export class CalendrierService {
       'meetingDate',
     );
 
-    
+
   
     console.log(meetings)
 
