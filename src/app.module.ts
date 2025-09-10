@@ -10,6 +10,9 @@ import { IdeaModule } from './modules/idea/idea.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AuditInterceptor } from './interceptors/audit.interceptor';
+import { MeetingModule } from './modules/meeting/meeting.module';
+import { DescenteModule } from './modules/descente/descente.module';
+import { CalendrierModule } from './modules/calendrier/calendrier.module';
 
 @Module({
   imports: [
@@ -19,7 +22,10 @@ import { AuditInterceptor } from './interceptors/audit.interceptor';
     PublicationModule,
     CategoriesModule,
     IdeaModule,
-    AuditModule
+    AuditModule,
+    MeetingModule,
+    DescenteModule,
+    CalendrierModule
   ],
   controllers: [AppController],
   providers: [
