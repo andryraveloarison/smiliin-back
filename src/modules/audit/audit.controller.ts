@@ -13,6 +13,12 @@ export class AuditController {
   }
 
 
+  // Voir l’historique d’une publication (Idea)
+  @Get('idea/:id')
+  async getIdeaHistory(@Param('id') id: string) {
+    return this.auditService.findByEntity('ideas', id);
+  }
+
   // Voir toutes les actions d’un utilisateur
   @Get('user/:id')
   async getUserHistory(@Param('id') id: string) {

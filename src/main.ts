@@ -24,8 +24,8 @@ async function bootstrap() {
   app.use(morgan('combined'));
 
   app.useGlobalInterceptors(new ResponseInterceptor());
-  const auditService = app.get(AuditService);
-  app.useGlobalInterceptors(new AuditInterceptor(auditService));
+  // const auditService = app.get(AuditService);
+  // app.useGlobalInterceptors(new AuditInterceptor(auditService));
   app.useGlobalFilters(new AllExceptionsFilter());
   app.useGlobalPipes(new ValidationPipe());
 

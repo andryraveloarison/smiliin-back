@@ -8,13 +8,17 @@ import {
     Param,
     UploadedFiles,
     UseInterceptors,
+    UseGuards,
   } from '@nestjs/common';
   import { FileFieldsInterceptor } from '@nestjs/platform-express';
   import { PublicationService } from './publication.service';
   import { CreatePublicationDto } from './dto/create-publication.dto';
   import { UpdatePublicationDto } from './dto/update-publication.dto';
   import { FileService } from '../../utils/file.service';
-  
+import { JwtAuthGuard } from 'src/guards/auth.guard';
+
+  @UseGuards(JwtAuthGuard) // ✅ Protection par token
+
   @Controller('publications')
   export class PublicationController {
     constructor(

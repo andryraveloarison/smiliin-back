@@ -8,6 +8,8 @@ import { PublicationModule } from './modules/publication/publication.module';
 import { CategoriesModule } from './modules/categorie/categorie.module';
 import { IdeaModule } from './modules/idea/idea.module';
 import { AuditModule } from './modules/audit/audit.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { AuditInterceptor } from './interceptors/audit.interceptor';
 
 @Module({
   imports: [
@@ -20,6 +22,12 @@ import { AuditModule } from './modules/audit/audit.module';
     AuditModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: AuditInterceptor,
+    },
+  ],
 })
 export class AppModule {}

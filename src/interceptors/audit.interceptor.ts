@@ -1,29 +1,32 @@
 // src/audit/audit.interceptor.ts
 import {
-    Injectable,
-    NestInterceptor,
-    ExecutionContext,
-    CallHandler,
-  } from '@nestjs/common';
-  import { Observable, tap } from 'rxjs';
+  Injectable,
+  NestInterceptor,
+  ExecutionContext,
+  CallHandler,
+} from '@nestjs/common';
+import { Observable, tap } from 'rxjs';
 import { AuditService } from 'src/modules/audit/audit.service';
-  
-  @Injectable()
-  export class AuditInterceptor implements NestInterceptor {
-    constructor(private readonly auditService: AuditService) {}
-  
-    intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
 
-      const req = context.switchToHttp().getRequest();
+@Injectable()
+export class AuditInterceptor implements NestInterceptor {
+  constructor(private readonly auditService: AuditService) {}
 
-      const userId = req.body.userId || null; // si JWT Guard appliqué
-      const method = req.method;
-      const url = req.url;
-  
-      return next.handle().pipe(
-        tap(async (result) => {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    const req = context.switchToHttp().getRequest();
+    const userId = req.user?.id || null; // si JWT Guard appliqué
+    const method = req.method;
+    const url = req.url;
+
+    console.log('OKE');
+    console.log('User:', userId);
+
+    return next.handle().pipe(
+      tap((result) => {
+        // 🔹 Exécution asynchrone, mais on n'attend pas (fire & forget)
+        (async () => {
           try {
-            // Déterminer l’action en fonction de la méthode HTTP
+            // Déterminer l’action
             let action: string;
             switch (method) {
               case 'POST':
@@ -39,30 +42,29 @@ import { AuditService } from 'src/modules/audit/audit.service';
               default:
                 action = 'Read';
             }
-  
-            // Identifier la ressource depuis l’URL (ex: /publications/...)
+
+            // Identifier l’entité depuis l’URL
             const entity = url.split('/')[1] || 'Unknown';
-  
-            // ID de la ressource si dispo (par ex. si result contient un id)
+
+            // Récupérer l’ID si dispo
             const entityId =
               result?.id || result?._id || req.params?.id || null;
-  
-            // Log dans la DB via ton AuditService
-            if(action != 'Read'){
-                await this.auditService.log(
-                    action,
-                    entity,
-                    entityId,
-                    userId,
-                    req,
-                  );
-            }
 
+            // 🔹 On log seulement si ce n’est pas un "Read"
+            if (action !== 'Read') {
+              await this.auditService.log(
+                action,
+                entity,
+                entityId,
+                userId,
+                req,
+              );
+            }
           } catch (e) {
-            console.error('Audit log failed', e);
+            console.error('Audit log failed:', e.message);
           }
-        }),
-      );
-    }
+        })();
+      }),
+    );
   }
-  
+}
