@@ -1,4 +1,3 @@
-// src/ideas/idea.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -14,11 +13,20 @@ export class IdeaService {
   }
 
   async findAll(): Promise<Idea[]> {
-    return this.ideaModel.find().populate('category').exec();
+    return this.ideaModel
+      .find()
+      .populate('category')
+      .populate('userId', 'id username email') // on renvoie seulement certains champs
+      .exec();
   }
 
   async findOne(id: string): Promise<Idea> {
-    const idea = await this.ideaModel.findById(id).populate('category').exec();
+    const idea = await this.ideaModel
+      .findById(id)
+      .populate('category')
+      .populate('userId', 'id username email')
+      .exec();
+
     if (!idea) throw new NotFoundException('Idea not found');
     return idea;
   }
@@ -27,7 +35,9 @@ export class IdeaService {
     const idea = await this.ideaModel
       .findByIdAndUpdate(id, data, { new: true })
       .populate('category')
+      .populate('userId', 'id username email')
       .exec();
+
     if (!idea) throw new NotFoundException('Idea not found');
     return idea;
   }

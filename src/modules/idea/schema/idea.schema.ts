@@ -6,6 +6,10 @@ export type IdeaDocument = Idea & Document;
 
 @Schema({ timestamps: true })
 export class Idea {
+
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+  userId: Types.ObjectId;
+  
   @Prop({ required: true })
   title: string;
 
