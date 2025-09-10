@@ -24,10 +24,10 @@ import { AuditInterceptor } from './interceptors/audit.interceptor';
   controllers: [AppController],
   providers: [
     AppService,
-    // {
-    //   provide: APP_INTERCEPTOR,
-    //   useClass: AuditInterceptor,
-    // },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: AuditInterceptor,
+    },
   ],
 })
 export class AppModule {}
