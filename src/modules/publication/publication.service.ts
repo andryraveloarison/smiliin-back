@@ -24,7 +24,7 @@ export class PublicationService {
       select: 'action createdAt', // info de l'audit
       populate: {
         path: 'user',           // populate le user de l'audit
-        select: 'email name',   // récupère email et nom
+        select: 'email name logo',   // récupère email et nom
       },
     }).exec();
   }
@@ -35,7 +35,7 @@ export class PublicationService {
       select: 'action createdAt', // info de l'audit
       populate: {
         path: 'user',           // populate le user de l'audit
-        select: 'email name',   // récupère email et nom
+        select: 'email name logo',   // récupère email et nom
       },
     }).exec();
     if (!pub) throw new NotFoundException(`Publication with id ${id} not found`);

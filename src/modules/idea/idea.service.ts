@@ -16,7 +16,7 @@ export class IdeaService {
     return this.ideaModel
       .find()
       .populate('category')
-      .populate('userId', 'id username email') // on renvoie seulement certains champs
+      .populate('userId', 'id name logo email') // on renvoie seulement certains champs
       .exec();
   }
 
@@ -24,7 +24,7 @@ export class IdeaService {
     const idea = await this.ideaModel
       .findById(id)
       .populate('category')
-      .populate('userId', 'id username email')
+      .populate('userId', 'id name logo email')
       .exec();
 
     if (!idea) throw new NotFoundException('Idea not found');
@@ -35,7 +35,7 @@ export class IdeaService {
     const idea = await this.ideaModel
       .findByIdAndUpdate(id, data, { new: true })
       .populate('category')
-      .populate('userId', 'id username email')
+      .populate('userId', 'id name logo email')
       .exec();
 
     if (!idea) throw new NotFoundException('Idea not found');
