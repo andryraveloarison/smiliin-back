@@ -17,6 +17,14 @@ export class CreateUserDto {
   logo?: string;
 
   @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsString()
+  pageId?: string;
+
+  @IsOptional()
   @IsIn(['client', 'admin'])
   role?: string;
 }

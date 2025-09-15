@@ -17,6 +17,12 @@ export class User {
   @Prop()
   logo: string;
 
+  @Prop()
+  description: string;
+
+  @Prop()
+  pageId: string;
+
   @Prop({ enum: ['client', 'admin'], default: 'client' })
   role: string;
 }

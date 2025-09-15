@@ -3,7 +3,9 @@ export interface UserResponse {
     name: string;       
     email: string;      
     code: string;       
-    logo?: string;      
+    logo?: string;    
+    description?: string;  
+    pageId?:string
     role: 'client' | 'admin';
     createdAt: string;  
     updatedAt: string;  
