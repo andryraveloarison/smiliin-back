@@ -9,7 +9,14 @@ export class IdeaService {
 
   async create(data: Partial<Idea>): Promise<Idea> {
     const idea = new this.ideaModel(data);
-    return idea.save();
+    const ideaSaved = await idea.save()
+    
+    const ideaReturn = await this.ideaModel
+    .findById(ideaSaved.id)
+    .populate('category')
+    .populate('userId', 'id name logo email')
+    .exec();
+    return ideaReturn;
   }
 
   async findAll(): Promise<Idea[]> {

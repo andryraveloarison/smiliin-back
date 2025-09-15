@@ -51,7 +51,7 @@ export class AuditInterceptor implements NestInterceptor {
               result?.id || result?._id || req.params?.id || null;
 
             // 🔹 On log seulement si ce n’est pas un "Read"
-            if (action !== 'Read') {
+            if (action !== 'Read' && userId) {
               await this.auditService.log(
                 action,
                 entity,

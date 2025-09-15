@@ -46,7 +46,7 @@ export class UserController {
   }
 
   // ➡️ READ ALL (admin only)
-  @UseGuards(AdminGuard)
+  //@UseGuards(AdminGuard)
   @Get()
   async findAll(): Promise<User[]> {
     return this.usersService.findAll();
@@ -82,7 +82,7 @@ export class UserController {
         file.originalname,
         'logo',
       );
-      updateUserDto.logo = publicUrl;
+      updateUserDto.logo = publicUrl; 
     }
     const updatedUser = await this.usersService.update(id, updateUserDto);
     if (!updatedUser) throw new NotFoundException(`User with id ${id} not found`);

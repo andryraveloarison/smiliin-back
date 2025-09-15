@@ -4,7 +4,7 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { v4 as uuidv4 } from 'uuid';
 import * as mime from 'mime-types';
 
-type Folder = 'logo' | 'idea' | 'post' | 'descente';
+type Folder = 'logo' | 'idea' | 'post' | 'descente'| 'insight';;
 
 @Injectable()
 export class FileService {

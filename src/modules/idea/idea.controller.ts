@@ -88,4 +88,4 @@ import { JwtAuthGuard } from 'src/guards/auth.guard';
       return this.ideaService.remove(id);
     }
   }
-  
+   

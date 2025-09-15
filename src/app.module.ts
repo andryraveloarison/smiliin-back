@@ -12,6 +12,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AuditInterceptor } from './interceptors/audit.interceptor';
 import { MeetingModule } from './modules/meeting/meeting.module';
 import { DescenteModule } from './modules/descente/descente.module';
+import { InsightModule } from './modules/insight/insight.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { DescenteModule } from './modules/descente/descente.module';
     AuditModule,
     MeetingModule,
     DescenteModule,
+    InsightModule
   ],
   controllers: [AppController],
   providers: [
