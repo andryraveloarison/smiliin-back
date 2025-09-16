@@ -27,11 +27,12 @@ export class InsightController {
 
   // CREATE (avec upload d'une seule image)
   @Post()
-  //@UseInterceptors(FileInterceptor('image'))
+  @UseInterceptors(FileInterceptor('image'))
   async create(
     @Body() dto: CreateInsightDto,
     @UploadedFile() file?: Express.Multer.File,
   ) {
+    
     if (file) {
       dto.image = await this.fileService.uploadFile(
         file.buffer,
