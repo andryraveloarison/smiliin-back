@@ -40,6 +40,9 @@ export class InsightController {
       );
     }
 
+    console.log("**************")
+    console.log(dto)
+    console.log("**************")
     return this.insightService.create(dto);
   }
 
