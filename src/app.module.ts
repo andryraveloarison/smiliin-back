@@ -13,6 +13,7 @@ import { AuditInterceptor } from './interceptors/audit.interceptor';
 import { MeetingModule } from './modules/meeting/meeting.module';
 import { DescenteModule } from './modules/descente/descente.module';
 import { InsightModule } from './modules/insight/insight.module';
+import { MetaModule } from './modules/meta/meta.module';
 
 @Module({
   imports: [
@@ -25,7 +26,8 @@ import { InsightModule } from './modules/insight/insight.module';
     AuditModule,
     MeetingModule,
     DescenteModule,
-    InsightModule
+    InsightModule,
+    MetaModule
   ],
   controllers: [AppController],
   providers: [

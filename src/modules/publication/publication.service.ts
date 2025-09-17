@@ -19,7 +19,7 @@ export class PublicationService {
   }
 
   async findAll(): Promise<Publication[]> {
-    return this.pubModel.find().populate('userId', 'id name email').populate({
+    return this.pubModel.find().populate('userId', 'id name email logo').populate({
       path: 'lastModified',
       select: 'action createdAt', 
       populate: {
