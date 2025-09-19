@@ -88,7 +88,6 @@ import { JwtAuthGuard } from 'src/guards/auth.guard';
       return this.ideaService.remove(id);
     }
 
-
     @Post('generate')
     async generateImage(@Body('prompt') prompt: string) {
       return this.ideaService.generate(prompt);

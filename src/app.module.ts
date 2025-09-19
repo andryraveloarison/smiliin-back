@@ -14,9 +14,11 @@ import { MeetingModule } from './modules/meeting/meeting.module';
 import { DescenteModule } from './modules/descente/descente.module';
 import { InsightModule } from './modules/insight/insight.module';
 import { MetaModule } from './modules/meta/meta.module';
+import { AiModule } from './modules/ai/ai.module';
 
 @Module({
   imports: [
+    
     MongooseModule.forRoot('mongodb://localhost:27017/smiliinDb'),
     UserModule,
     AuthModule,
@@ -27,7 +29,8 @@ import { MetaModule } from './modules/meta/meta.module';
     MeetingModule,
     DescenteModule,
     InsightModule,
-    MetaModule
+    MetaModule,
+    AiModule
   ],
   controllers: [AppController],
   providers: [

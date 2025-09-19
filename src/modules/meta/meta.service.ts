@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
+import { getPageInfo } from './utils/facebook/getPageInfo';
+import { getAllPage } from './utils/facebook/getAllPage';
 
 @Injectable()
 export class MetaService {
@@ -74,4 +76,12 @@ export class MetaService {
       rows,
     };
   }
+
+  async getPageInfo(pageId: string){
+      return getPageInfo(pageId)
+  }
+
+  async getAllPage(){
+    return getAllPage()
+}
 }
