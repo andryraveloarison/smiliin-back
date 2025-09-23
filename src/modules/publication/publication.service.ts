@@ -31,6 +31,9 @@ export class PublicationService {
 
   async findOne(id: string): Promise<Publication> {
     const pub = await this.pubModel.findById(id).populate({
+      path: 'postBudget', // <--- virtual populate
+      select: 'objectif budget depense isBoosted boostPrice month pageId id',
+    }).populate({
       path: 'lastModified',
       select: 'action createdAt', 
       populate: {

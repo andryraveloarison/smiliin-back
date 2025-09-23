@@ -15,6 +15,7 @@ import { DescenteModule } from './modules/descente/descente.module';
 import { InsightModule } from './modules/insight/insight.module';
 import { MetaModule } from './modules/meta/meta.module';
 import { AiModule } from './modules/ai/ai.module';
+import { BudgetModule } from './modules/budget/budget.module';
 
 @Module({
   imports: [
@@ -30,7 +31,8 @@ import { AiModule } from './modules/ai/ai.module';
     DescenteModule,
     InsightModule,
     MetaModule,
-    AiModule
+    AiModule,
+    BudgetModule
   ],
   controllers: [AppController],
   providers: [

@@ -2,7 +2,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { AuditLog } from '../../audit/schema/audit-log.schema';
-import { User } from '../../user/schema/user.schema';
 
 export type PublicationDocument = Publication & Document;
 
@@ -31,13 +30,26 @@ export class Publication {
 
   @Prop()
   publishDate?: Date;
+
+  @Prop({ type: Types.ObjectId, ref: 'PostBudget' })
+  postBudgetId: Types.ObjectId;
+
 }
+
+
 
 export const PublicationSchema = SchemaFactory.createForClass(Publication);
 
 // Virtual id
 PublicationSchema.virtual('id').get(function (this: PublicationDocument) {
   return (this._id as Types.ObjectId).toHexString();
+});
+
+PublicationSchema.virtual('postBudget', {
+  ref: 'PostBudget',
+  localField: '_id',
+  foreignField: 'postId',
+  justOne: true,
 });
 
 // Virtual lastModified

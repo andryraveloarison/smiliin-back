@@ -5,10 +5,6 @@ import { MetaService } from './meta.service';
 export class MetaController {
   constructor(private readonly metaService: MetaService) {}
 
-  @Get()
-  async getMeta() {
-    return this.metaService.getData();
-  }
 
   @Get('getAllPage')
   async getAllPage(): Promise<any> {
@@ -18,5 +14,11 @@ export class MetaController {
   @Get('getPageInfo/:pageId')
   async getPageInfo(@Param('pageId') pageId: string): Promise<any> {
     return this.metaService.getPageInfo(pageId);
+  }
+
+
+  @Get('getAdsPage')
+  async getAdsPage(): Promise<any> {
+    return this.metaService.getAdsPage();
   }
 }
