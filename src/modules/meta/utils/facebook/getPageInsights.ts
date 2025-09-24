@@ -8,7 +8,7 @@ const BASE_URL = "https://graph.facebook.com/v23.0/";
  */
 export async function getPageInsights(pageId: string, period: string) {
 
-  period = "since=2025-09-01&until=2025-09-29"
+  //period = "since=2025-09-01&until=2025-09-29"
   const token = getTokenByPageId(pageId);
 
   const URL = BASE_URL + pageId + "/insights?metric=page_impressions_unique,page_fan_adds,page_views_total,page_post_engagements,page_media_view,page_messages_new_conversations_unique&period=day&"+period+"&access_token="+token

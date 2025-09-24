@@ -1,46 +1,69 @@
 import axios from "axios";
 import 'dotenv/config';
-import { writeFile } from "fs/promises"; // version async/await
+import { FileService } from "src/utils/file.service";
 
-export async function generate(prompt: string): Promise<{ url: string; filePath: string }> {
+const fileService = new FileService();
+
+export async function generateWithGemini(prompt: string): Promise<{ url: string }> {
   try {
-    console.log("GENERATION");
-    prompt = "A cat on the road on tesla cars";
+    const payload = {
+      model: "google/gemini-2.5-flash-image-preview",
+      messages: [
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      modalities: ["image", "text"],
+    };
 
-    const form = new FormData();
-    form.append("prompt", prompt);
-    form.append("output_format", "png");
-
-    const response = await axios.post(     
-      "https://api.stability.ai/v2beta/stable-image/generate/core",
-      form,
+    const response = await axios.post(
+      "https://openrouter.ai/api/v1/chat/completions",
+      payload,
       {
         headers: {
-          Authorization: `Bearer ${process.env.STABILITY_API_KEY}`,
-          Accept: "application/json",
-          ...((form as any).getHeaders?.() || {}),
+          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          "Content-Type": "application/json",
         },
       }
-    ) as any;
+    );
 
-    // ⚡ Vérifie la structure (parfois c’est image_base64[0], parfois image)
-    const b64 = response.data.image_base64?.[0] || response.data.image;
+    const data = response.data as any;
 
-    // Crée un buffer à partir du base64
+    const choices = data.choices;
+
+    if (!choices || choices.length === 0) {
+      throw new Error("Pas de choix retourné par l'API");
+    }
+
+    const message = choices[0].message;
+    const images = message.images;
+    if (!images || images.length === 0) {
+      throw new Error("Pas d’image dans la réponse");
+    }
+    // On prend la première image
+    const imageObj = images[0];
+    const imageUrl = imageObj.image_url?.url;
+    if (!imageUrl) {
+      throw new Error("L’URL/base64 de l’image est manquante");
+    }
+
+    // imageUrl = "data:image/png;base64,XXXX..."
+    const [_, b64] = imageUrl.split(",");
+    if (!b64) {
+      throw new Error("La partie base64 est vide");
+    }
+
+    // Convertir en buffer
     const buffer = Buffer.from(b64, "base64");
 
-    // Choisis un nom de fichier
-    const filePath = `generated_${Date.now()}.png`;
+    // Upload vers Supabase via ton FileService
+    const filename = `generated_gemini_${Date.now()}.png`;
+    const url = await fileService.uploadFile(buffer, filename, "idea");
 
-    // Sauvegarde le fichier sur disque
-    await writeFile(filePath, buffer);
-
-    console.log(`✅ Image sauvegardée : ${filePath}`);
-
-    // Renvoie à la fois l’URL base64 et le chemin du fichier
-    return { url: `data:image/png;base64,${b64}`, filePath };
-  } catch (error: any) {
-    console.error("Erreur génération image:", error.response?.data || error);
-    throw new Error("Impossible de générer l’image");
+    return { url }; // ✅ Retourne directement l'URL publique de Supabase
+  } catch (err: any) {
+    console.error("Erreur génération Gemini:", err.response?.data || err.message || err);
+    throw new Error("Impossible de générer l’image avec Gemini");
   }
 }
