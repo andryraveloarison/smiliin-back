@@ -41,7 +41,7 @@ export class BudgetService {
       postId: new Types.ObjectId(data.postId),
       pageId: new Types.ObjectId(data.pageId),
     });
-    return budget.save();
+    return (await budget.save()).populate('postId', 'title userId');
   }
 
   async getPostBudgets(): Promise<PostBudget[]> {
@@ -51,7 +51,7 @@ export class BudgetService {
   async updatePostBudget(id: string, data: Partial<PostBudget>): Promise<PostBudget> {
     if (data.postId) data.postId = new Types.ObjectId(data.postId);
     if (data.pageId) data.pageId = new Types.ObjectId(data.pageId);
-    return this.postBudgetModel.findByIdAndUpdate(id, data, { new: true }).exec();
+    return this.postBudgetModel.findByIdAndUpdate(id, data, { new: true }).populate('postId', 'title userId').exec();
   }
 
 
