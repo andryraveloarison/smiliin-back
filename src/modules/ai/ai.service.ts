@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { generate } from './utils/generateImage';
+import { generate } from './utils/generateImageGemini';
 import { generatePrompt } from './utils/generatePrompt';
 import { generateImage } from './utils/generateImageTest';
 
@@ -7,7 +7,7 @@ import { generateImage } from './utils/generateImageTest';
 export class AiService {
   // Génère une image directement à partir d’un prompt
   async generateImage(prompt: string) {
-    return await generateImage(prompt);
+    return await generate(prompt);
   }
 
   // Génère un prompt publicitaire + image à partir d’une description d’entreprise

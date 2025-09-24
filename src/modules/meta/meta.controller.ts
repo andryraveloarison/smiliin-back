@@ -17,6 +17,16 @@ export class MetaController {
   }
 
 
+
+  @Get('getPageInsights/:pageId/:period')
+  async getPageInsights(
+    @Param('pageId') pageId: string,
+    @Param('period') period: string,
+  ) {
+    return this.metaService.getPageInsights(pageId, period);
+  }
+
+
   @Get('getAdsPage')
   async getAdsPage(): Promise<any> {
     return this.metaService.getAdsPage();

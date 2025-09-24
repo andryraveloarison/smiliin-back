@@ -4,6 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { getPageInfo } from './utils/facebook/getPageInfo';
 import { getAllPage } from './utils/facebook/getAllPage';
 import { getAdsPage } from './utils/facebook/getAdsPage';
+import { getPageInsights } from './utils/facebook/getPageInsights';
 
 @Injectable()
 export class MetaService {
@@ -15,6 +16,10 @@ export class MetaService {
   async getAllPage(){
     return getAllPage()
   } 
+
+  async getPageInsights(pageId: string, period: string){
+    return getPageInsights(pageId, period)
+  }
 
   async getAdsPage(){
     return getAdsPage()

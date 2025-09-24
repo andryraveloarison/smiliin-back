@@ -3,8 +3,6 @@ import 'dotenv/config'; // ⚡ assure que .env est chargé
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY; // ⚡ stocke ta clé dans .env
 
-
-
 export async function generate(prompt: string): Promise<{ url: string }> {
   console.log(GEMINI_API_KEY)
 console.log("*******************************")
