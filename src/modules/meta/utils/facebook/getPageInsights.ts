@@ -20,8 +20,13 @@ export async function getPageInsights(pageId: string, period: string) {
     console.log(url)
     console.log("*******")
 
-    const response = await axios.get(url);
-    return response.data;
+    const response = await axios.get(url) as any;
+    
+    return {
+      data: response.data.data,
+      paging: response.data.paging,
+      id: pageId
+    };
   } catch (error: any) {
     console.log(error)
     console.error("Erreur getPageInfo:", error.response?.data || error.message);
