@@ -16,6 +16,7 @@ import { InsightModule } from './modules/insight/insight.module';
 import { MetaModule } from './modules/meta/meta.module';
 import { AiModule } from './modules/ai/ai.module';
 import { BudgetModule } from './modules/budget/budget.module';
+import { PublicationideaModule } from './modules/publicationidea/publicationidea.module';
 
 @Module({
   imports: [
@@ -32,7 +33,8 @@ import { BudgetModule } from './modules/budget/budget.module';
     InsightModule,
     MetaModule,
     AiModule,
-    BudgetModule
+    BudgetModule,
+    PublicationideaModule
   ],
   controllers: [AppController],
   providers: [

@@ -19,7 +19,16 @@ export class PublicationService {
   }
 
   async findAll(): Promise<Publication[]> {
-    return this.pubModel.find().populate('userId', 'id name email logo').populate({
+    return this.pubModel.find()
+    .populate('userId', 'id name email logo')
+    .populate({
+      path: 'publicationIdeas',
+      populate: {
+        path: 'ideas',
+        select: 'id title images type', // champs utiles de Idea
+      },
+    })
+    .populate({
       path: 'postBudget', // <--- virtual populate
       select: 'objectif budget depense isBoosted boostPrice month pageId id',
     }).populate({
@@ -33,7 +42,15 @@ export class PublicationService {
   }
 
   async findOne(id: string): Promise<Publication> {
-    const pub = await this.pubModel.findById(id).populate({
+    const pub = await this.pubModel.findById(id)
+    .populate({
+      path: 'publicationIdeas',
+      populate: {
+        path: 'ideas',
+        select: 'id title images type', // champs utiles de Idea
+      },
+    })
+        .populate({
       path: 'postBudget', // <--- virtual populate
       select: 'objectif budget depense isBoosted boostPrice month pageId id',
     }).populate({

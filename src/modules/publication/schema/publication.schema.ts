@@ -34,6 +34,7 @@ export class Publication {
   @Prop({ type: Types.ObjectId, ref: 'PostBudget' })
   postBudgetId: Types.ObjectId;
 
+
 }
 
 
@@ -50,6 +51,13 @@ PublicationSchema.virtual('postBudget', {
   localField: '_id',
   foreignField: 'postId',
   justOne: true,
+});
+
+PublicationSchema.virtual('publicationIdeas', {
+  ref: 'PublicationIdea',
+  localField: '_id',
+  foreignField: 'publication',
+  justOne: true, // ⚡ une publication n’a qu’un seul PublicationIdea
 });
 
 // Virtual lastModified
