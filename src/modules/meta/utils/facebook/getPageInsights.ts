@@ -21,12 +21,17 @@ export async function getPageInsights(pageId: string, period: string) {
     console.log("*******")
 
     const response = await axios.get(url) as any;
-    
+
+    let since = period.split('&')
+    let start = since[0].split('=')[1]
+    let end = since[1].split('=')[1]
+
     return {
       data: response.data.data,
       paging: response.data.paging,
       id: pageId,
-      period
+      start,
+      end
     };
   } catch (error: any) {
     console.log(error)
