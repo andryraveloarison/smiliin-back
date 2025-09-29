@@ -28,6 +28,7 @@ export class AiController {
     }
     try {
       const result = await this.aiService.generateAd(dto.entreprise,dto.previousIdea);
+
       return {result };
     } catch (error) {
       return { success: false, message: 'Erreur lors de la génération de publicité' };

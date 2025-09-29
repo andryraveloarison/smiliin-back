@@ -25,7 +25,8 @@ export async function getPageInsights(pageId: string, period: string) {
     return {
       data: response.data.data,
       paging: response.data.paging,
-      id: pageId
+      id: pageId,
+      period
     };
   } catch (error: any) {
     console.log(error)

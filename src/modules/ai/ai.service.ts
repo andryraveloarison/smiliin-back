@@ -13,7 +13,9 @@ export class AiService {
 
   // Génère un prompt publicitaire + image à partir d’une description d’entreprise
   async generateAd(entreprise: string, previousPrompts: string) {
+
     const adPrompt = await generatePrompt(entreprise, previousPrompts);
+    return
     const image = await generate(adPrompt);
 
     return {
