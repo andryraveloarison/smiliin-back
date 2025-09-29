@@ -1,7 +1,8 @@
 // src/lib/events.ts
-import fs from "fs";
+import * as fs from "fs";
 import * as path from "path";
 import * as XLSX from "xlsx";
+
 
 export type EventType = "international" | "madagascar";
 export type EventOccurrence = {
@@ -25,25 +26,23 @@ function safeDirname(): string {
 
 function resolveExcelPath(): string {
   const fromCwd = process.cwd();
-  const fromHere = safeDirname();
 
   const candidates = [
-    process.env.EVENTS_XLSX,                              // 1) via variable d'env si définie
-    path.resolve(fromCwd, "data_event.xlsx"),             // 2) ./data_event.xlsx à la racine
-    path.resolve(fromCwd, "data/data_event.xlsx"),        // 3) ./data/data_event.xlsx à la racine
-    path.resolve(fromHere, "../../../../data_event.xlsx"),// 4) relatif au fichier compilé
-    path.resolve(fromHere, "../../../../data/data_event.xlsx"),
+    process.env.EVENTS_XLSX,                             // 1) défini via env
+    path.resolve(fromCwd, "src/data/data_event.xlsx"),   // 2) fichier dans src/data
+    path.resolve(fromCwd, "data/data_event.xlsx"),       // 3) fichier dans un dossier data à la racine
+    path.resolve(fromCwd, "data_event.xlsx"),            // 4) fichier direct à la racine
   ].filter(Boolean) as string[];
 
   for (const p of candidates) {
-    try {
-      if (fs.existsSync(p)) return p;
-    } catch {}
+    if (fs.existsSync(p)) return p;
   }
 
-  // Dernière chance : la valeur la plus probable côté projet
-  return path.resolve(fromCwd, "data/data_event.xlsx");
+  throw new Error(
+    `[events] Fichier introuvable: vérifie ./src/data/data_event.xlsx ou définis EVENTS_XLSX`
+  );
 }
+
 
 const EXCEL_PATH = resolveExcelPath();
 let DID_LOG_PATH = false;

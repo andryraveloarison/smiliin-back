@@ -50,7 +50,7 @@ PublicationSchema.virtual('postBudget', {
   ref: 'PostBudget',
   localField: '_id',
   foreignField: 'postId',
-  justOne: true,
+  justOne: false,
 });
 
 PublicationSchema.virtual('publicationIdeas', {

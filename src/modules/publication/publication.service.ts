@@ -18,29 +18,65 @@ export class PublicationService {
     return newPub.save();
   }
 
-  async findAll(): Promise<Publication[]> {
-    return this.pubModel.find()
-    .populate('userId', 'id name email logo')
-    .populate({
-      path: 'publicationIdeas',
-      populate: {
-        path: 'ideas',
-        select: 'id title images type', // champs utiles de Idea
-      },
-    })
-    .populate({
-      path: 'postBudget', // <--- virtual populate
-      select: 'objectif budget depense isBoosted boostPrice month pageId id',
-    }).populate({
-      path: 'lastModified',
-      select: 'action createdAt', 
-      populate: {
-        path: 'user',           
-        select: 'email name logo',   
-      },
-    }).exec();
+  // async findAll(): Promise<Publication[]> {
+  //   return this.pubModel.find()
+  //   .populate('userId', 'id name email logo')
+  //   .populate({
+  //     path: 'publicationIdeas',
+  //     populate: {
+  //       path: 'ideas',
+  //       select: 'id title images type', // champs utiles de Idea
+  //     },
+  //   })
+  //   .populate({
+  //     path: 'postBudget', // <--- virtual populate
+  //     select: 'objectif budget depense isBoosted boostPrice month pageId id',
+  //   }).populate({
+  //     path: 'lastModified',
+  //     select: 'action createdAt', 
+  //     populate: {
+  //       path: 'user',           
+  //       select: 'email name logo',   
+  //     },
+  //   }).exec();
+  // }
+
+  async findAll(): Promise<any[]> {
+    const publications = await this.pubModel.find()
+      .populate('userId', 'id name email logo')
+      .populate({
+        path: 'publicationIdeas',
+        populate: {
+          path: 'ideas',
+          select: 'id title images type',
+        },
+      })
+      .populate({
+        path: 'postBudget',
+        select: 'isBoosted',
+      })
+      .populate({
+        path: 'lastModified',
+        select: 'action createdAt',
+        populate: {
+          path: 'user',
+          select: 'email name logo',
+        },
+      })
+      .exec();
+  
+      return publications.map(pub => {
+        const p = pub.toJSON() as any; // ou <any>pub
+        return {
+          ...p,
+          isBoosted: p.postBudget ? p.postBudget.isBoosted : false,
+          postBudget: undefined,
+        };
+      });
+      
   }
 
+  
   async findOne(id: string): Promise<Publication> {
     const pub = await this.pubModel.findById(id)
     .populate({

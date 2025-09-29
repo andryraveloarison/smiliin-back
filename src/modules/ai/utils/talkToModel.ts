@@ -1,33 +1,40 @@
 import axios from "axios";
-import 'dotenv/config'; // ⚡ assure que .env est chargé
+import "dotenv/config";
 
-// ⚡ Fonction pour envoyer un prompt et recevoir un texte
 export async function talkToModel(prompt: string): Promise<string> {
-    
+  const apiKey = process.env.LLAMA_MODEL_API_KEY;
+  if (!apiKey) {
+    throw new Error("La clé LLAMA_MODEL_API_KEY n’est pas définie");
+  }
+
   try {
-
-  const apiKey = process.env.AI_API_KEY;
-
-  if (!apiKey) throw new Error('La clé AI_API_KEY n’est pas définie');
-
     const response = await axios.post<any>(
-      "https://models.github.ai/inference/chat/completions", // 👉 remplace par ton endpoint réel
+      "https://openrouter.ai/api/v1/chat/completions",
       {
-        model: "xai/grok-3", // ou le modèle que tu utilises
-        messages: [{ role: "user", content: prompt }],
+        model: "meta-llama/llama-4-maverick:free", // nom du modèle OpenRouter
+        messages: [
+          { role: "user", content: prompt },
+        ],
+        max_tokens: 500,        // par exemple
+        temperature: 0.7,       // ajustable
+        // tu peux ajouter d’autres paramètres supportés par OpenRouter
       },
       {
         headers: {
-          Authorization: `Bearer ${process.env.AI_API_KEY}`, // clé stockée dans les variables d’environnement
+          Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
         },
       }
     );
 
-    // ⚡ On récupère le texte de la réponse
-    return response.data.choices[0].message.content;
+    // la réponse a une structure similaire à celle d’OpenAI
+    const choices = response.data.choices;
+    if (!choices || choices.length === 0) {
+      throw new Error("Aucune réponse reçue du modèle");
+    }
+    return choices[0].message.content;
   } catch (error: any) {
-    console.error("Erreur talkToModel:", error.response?.data || error);
-    throw new Error("Impossible d’obtenir une réponse du modèle");
+    console.error("Erreur talkToModel (OpenRouter):", error.response?.data || error.message || error);
+    throw new Error("Impossible d’obtenir une réponse du modèle via OpenRouter");
   }
 }

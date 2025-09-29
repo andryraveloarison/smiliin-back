@@ -22,7 +22,7 @@ export async function generateWithGemini(prompt: string): Promise<{ url: string 
       payload,
       {
         headers: {
-          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          Authorization: `Bearer ${process.env.GEMINI_MODEL_API_KEY}`,
           "Content-Type": "application/json",
         },
       }

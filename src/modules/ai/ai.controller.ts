@@ -27,7 +27,7 @@ export class AiController {
       return { error: 'La description de l’entreprise est requise' };
     }
     try {
-      const result = await this.aiService.generateAd(dto.entreprise,dto.previousIdea);
+      const result = await this.aiService.generateAd(dto.entreprise);
 
       return {result };
     } catch (error) {

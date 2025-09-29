@@ -1,7 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { generate } from './utils/generateImageGemini';
 import { generatePrompt } from './utils/generatePrompt';
-import { generateImage } from './utils/generateImageTest';
 import { generateWithGemini } from './utils/generateImage';
 
 @Injectable()
@@ -12,11 +10,14 @@ export class AiService {
   }
 
   // Génère un prompt publicitaire + image à partir d’une description d’entreprise
-  async generateAd(entreprise: string, previousPrompts: string) {
+  async generateAd(entreprise: string) {
 
-    const adPrompt = await generatePrompt(entreprise, previousPrompts);
+    const adPrompt = await generatePrompt(entreprise);
+    console.log("********************************")
+    console.log(adPrompt)
+    console.log("********************************")
     return
-    const image = await generate(adPrompt);
+    const image = await generateWithGemini(adPrompt);
 
     return {
       entreprise,
