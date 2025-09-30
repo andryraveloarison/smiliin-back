@@ -125,7 +125,7 @@ export class PublicationService {
       // --- Jointure avec postBudget ---
       {
         $lookup: {
-          from: 'postbudgets', // nom de la collection Mongo
+          from: 'postbudget', // nom de la collection Mongo
           localField: '_id',
           foreignField: 'publicationId',
           as: 'postBudget',
