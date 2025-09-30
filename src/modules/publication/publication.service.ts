@@ -66,6 +66,7 @@ export class PublicationService {
       .exec();
 
       return publications;
+
       
   }
 
@@ -121,6 +122,33 @@ export class PublicationService {
           publishDate: { $gte: tenMonthsAgo, $lte: now },
         },
       },
+      // --- Jointure avec postBudget ---
+      {
+        $lookup: {
+          from: 'postbudgets', // nom de la collection Mongo
+          localField: '_id',
+          foreignField: 'publicationId',
+          as: 'postBudget',
+        },
+      },
+      // --- Jointure avec publicationIdeas ---
+      {
+        $lookup: {
+          from: 'publicationideas',
+          localField: '_id',
+          foreignField: 'publication',
+          as: 'publicationIdeas',
+        },
+      },
+      // --- Jointure avec ideas (imbriqué) ---
+      {
+        $lookup: {
+          from: 'ideas',
+          localField: 'publicationIdeas.ideas',
+          foreignField: '_id',
+          as: 'ideas',
+        },
+      },
       {
         $group: {
           _id: { $dateToString: { format: '%Y-%m', date: '$publishDate' } },
@@ -130,7 +158,7 @@ export class PublicationService {
       },
       {
         $addFields: {
-          month: '$_id', // on renomme le _id du groupe
+          month: '$_id',
           publications: {
             $map: {
               input: '$publications',
@@ -145,18 +173,34 @@ export class PublicationService {
                 publishDate: '$$pub.publishDate',
                 createdAt: '$$pub.createdAt',
                 updatedAt: '$$pub.updatedAt',
-                lien: '$$pub.lien'
-              }
-            }
-          }
-        }
+                lien: '$$pub.lien',
+                postBudget: '$$pub.postBudget',
+                publicationIdeas: {
+                  $map: {
+                    input: '$$pub.publicationIdeas',
+                    as: 'pi',
+                    in: {
+                      id: '$$pi._id',
+                      ideas: {
+                        $filter: {
+                          input: '$$pub.ideas',
+                          as: 'idea',
+                          cond: { $in: ['$$idea._id', '$$pi.ideas'] },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       },
-      {
-        $project: { _id: 0 } // supprime l'ancien _id du groupe
-      },
+      { $project: { _id: 0 } },
       { $sort: { month: 1 } },
     ]);
   }
+  
   
   
 
@@ -170,14 +214,37 @@ export class PublicationService {
           userId,
           publishDate: { $gte: startOfMonth, $lte: endOfMonth },
         },
-        
       },
       {
-        $addFields: { id: '$_id' }, // crée le champ id
-      },  
+        $lookup: {
+          from: 'postbudgets',
+          localField: '_id',
+          foreignField: 'publicationId',
+          as: 'postBudget',
+        },
+      },
+      {
+        $lookup: {
+          from: 'publicationideas',
+          localField: '_id',
+          foreignField: 'publication',
+          as: 'publicationIdeas',
+        },
+      },
+      {
+        $lookup: {
+          from: 'ideas',
+          localField: 'publicationIdeas.ideas',
+          foreignField: '_id',
+          as: 'ideas',
+        },
+      },
+      {
+        $addFields: { id: '$_id' },
+      },
       {
         $project: {
-          _id: 0,           // supprime _id
+          _id: 0,
           userId: 1,
           title: 1,
           description: 1,
@@ -186,12 +253,31 @@ export class PublicationService {
           publishDate: 1,
           createdAt: 1,
           updatedAt: 1,
-          id: 1,            // garde id créé par $addFields
+          id: 1,
+          lien: 1,
+          postBudget: 1,
+          publicationIdeas: {
+            $map: {
+              input: '$publicationIdeas',
+              as: 'pi',
+              in: {
+                id: '$$pi._id',
+                ideas: {
+                  $filter: {
+                    input: '$ideas',
+                    as: 'idea',
+                    cond: { $in: ['$$idea._id', '$$pi.ideas'] },
+                  },
+                },
+              },
+            },
+          },
         },
-    },
+      },
       { $sort: { publishDate: 1 } },
     ]);
   }
+  
   
   
   
