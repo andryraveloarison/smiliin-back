@@ -64,6 +64,8 @@ export class PublicationService {
         },
       })
       .exec();
+
+      return publications;
   
       return publications.map(pub => {
         const p = pub.toJSON() as any; // ou <any>pub
