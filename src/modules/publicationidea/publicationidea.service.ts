@@ -27,28 +27,31 @@ export class PublicationIdeaService {
   }
 
 
-  // Ajouter une idée dans PublicationIdea
-  async addIdea(publicationIdeaId: string, ideaId: string): Promise<PublicationIdea> {
-    const pubIdea = await this.publicationIdeaModel.findById(publicationIdeaId);
-    if (!pubIdea) throw new NotFoundException('PublicationIdea not found');
+  // Ajouter une idée en utilisant publicationId
+  async addIdea(publicationId: string, ideaId: string): Promise<PublicationIdea> {
+    // Récupère le PublicationIdea lié à la publication
+    const pubIdea = await this.publicationIdeaModel.findOne({ publication: publicationId });
+    if (!pubIdea) throw new NotFoundException('PublicationIdea not found for this publication');
 
+    // Ajoute l'idée si elle n'est pas déjà dans le tableau
     if (!pubIdea.ideas.includes(new Types.ObjectId(ideaId))) {
       pubIdea.ideas.push(new Types.ObjectId(ideaId));
     }
-    return pubIdea.save();
-  }
-
-  // Supprimer une idée du tableau
-  async removeIdea(publicationIdeaId: string, ideaId: string): Promise<PublicationIdea> {
-    const pubIdea = await this.publicationIdeaModel.findById(publicationIdeaId);
-    if (!pubIdea) throw new NotFoundException('PublicationIdea not found');
-
-    pubIdea.ideas = pubIdea.ideas.filter(
-      (id) => id.toString() !== ideaId,
-    );
 
     return pubIdea.save();
   }
+
+  // Supprimer une idée en utilisant publicationId
+  async removeIdea(publicationId: string, ideaId: string): Promise<PublicationIdea> {
+    const pubIdea = await this.publicationIdeaModel.findOne({ publication: publicationId });
+    if (!pubIdea) throw new NotFoundException('PublicationIdea not found for this publication');
+
+    // Filtrer le tableau pour enlever l'idée
+    pubIdea.ideas = pubIdea.ideas.filter(id => id.toString() !== ideaId);
+
+    return pubIdea.save();
+  }
+
 
   // Récupérer toutes les PublicationIdea
   async findAll(): Promise<PublicationIdea[]> {

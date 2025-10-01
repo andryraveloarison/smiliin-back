@@ -114,7 +114,9 @@ export class PublicationService {
    if (!updated) throw new NotFoundException(`Publication with id ${id} not found`);
 
     // ✅ Émettre le socket ici
-    this.socketGateway.emitUpdatePublication(updated._id.toString());
+    this.socketGateway.emitSocket('publication',{
+      id: updated._id.toString(),
+      action: 'update'});
 
    return updated;
  }

@@ -6,7 +6,12 @@ import {
     OnGatewayDisconnect,
   } from '@nestjs/websockets';
   import { Server, Socket } from 'socket.io';
-  
+
+  interface socketInterface {
+    action: string,
+    id?:string
+  }
+
   @WebSocketGateway({
     cors: {
       origin: '*', // ⚠️ en prod, mets ton domaine front
@@ -34,8 +39,8 @@ import {
       this.server.emit('publicationCreated', pub);
     }
 
-    emitUpdatePublication(id: string) {
-        this.server.emit('updatePublication', { id });
+    emitSocket(module:string, data: socketInterface) {
+        this.server.emit(module,data);
       }
   }
   
