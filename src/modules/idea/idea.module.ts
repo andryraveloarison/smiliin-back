@@ -6,10 +6,11 @@ import { IdeaService } from './idea.service';
 import { IdeaController } from './idea.controller';
 import { FileService } from 'src/utils/file.service';
 import { AuthModule } from '../auth/auth.module';
+import { SocketGateway } from '../socket/socket.gateway';
 
 @Module({
   imports: [MongooseModule.forFeature([{ name: Idea.name, schema: IdeaSchema }]), AuthModule],
-  providers: [IdeaService, FileService],
+  providers: [IdeaService, FileService, SocketGateway],
   controllers: [IdeaController],
 })
 export class IdeaModule {}

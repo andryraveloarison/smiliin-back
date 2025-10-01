@@ -3,10 +3,15 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Idea, IdeaDocument } from './schema/idea.schema';
 import axios from 'axios';
+import { SocketGateway } from '../socket/socket.gateway';
 
 @Injectable()
 export class IdeaService {
-  constructor(@InjectModel(Idea.name) private ideaModel: Model<IdeaDocument>) {}
+  constructor(
+    @InjectModel(Idea.name) private ideaModel: Model<IdeaDocument>,
+    private readonly socketGateway: SocketGateway,
+  
+  ) {}
 
   async create(data: Partial<Idea>): Promise<Idea> {
     const idea = new this.ideaModel(data);
@@ -17,6 +22,11 @@ export class IdeaService {
     .populate('category')
     .populate('userId', 'id name logo email')
     .exec();
+
+    this.socketGateway.emitSocket('Idea',{
+      id: ideaReturn._id.toString(),
+      action:'create'});
+    
     return ideaReturn;
   }
 
@@ -47,11 +57,20 @@ export class IdeaService {
       .exec();
 
     if (!idea) throw new NotFoundException('Idea not found');
+
+    this.socketGateway.emitSocket('Idea',{
+      id,
+      action:'update'});
+
     return idea;
   }
 
   async remove(id: string): Promise<void> {
     const result = await this.ideaModel.findByIdAndDelete(id).exec();
+    this.socketGateway.emitSocket('Idea',{
+      id,
+      action:'delete'});
+
     if (!result) throw new NotFoundException('Idea not found');
   }
 

@@ -2,12 +2,14 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { PublicationIdea } from './schema/publicationidea.schema';
+import { SocketGateway } from '../socket/socket.gateway';
 
 @Injectable()
 export class PublicationIdeaService {
   constructor(
     @InjectModel(PublicationIdea.name)
     private readonly publicationIdeaModel: Model<PublicationIdea>,
+    private readonly socketGateway: SocketGateway,
   ) {}
 
   // Créer un PublicationIdea
@@ -21,7 +23,10 @@ export class PublicationIdeaService {
     // Vérifie si un PublicationIdea existe déjà pour cette publication
     let pubIdea = await this.publicationIdeaModel.findOne({ publication: new Types.ObjectId(publicationId)  });
   
+    let action = 'create'
+
     if (pubIdea) {
+      action = 'update'
       // Si l'idée n'existe pas déjà dans le tableau, on l'ajoute
       if (!pubIdea.ideas.includes(new Types.ObjectId(ideaId))) {
         pubIdea.ideas.push(new Types.ObjectId(ideaId));
@@ -34,6 +39,10 @@ export class PublicationIdeaService {
       });
     }
   
+    this.socketGateway.emitSocket('publicationIdea',{
+      id: publicationId,
+      action});
+
     return pubIdea.save();
   }
 
@@ -62,6 +71,10 @@ export class PublicationIdeaService {
 
     // Filtrer le tableau pour enlever l'idée
     pubIdea.ideas = pubIdea.ideas.filter(id => id.toString() !== ideaId);
+
+    this.socketGateway.emitSocket('publicationIdea',{
+      id: publicationId,
+      action: 'delete'});
 
     return pubIdea.save();
   }
