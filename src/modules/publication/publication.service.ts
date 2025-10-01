@@ -9,10 +9,12 @@ import { CreatePublicationDto } from './dto/create-publication.dto';
 import { UpdatePublicationDto } from './dto/update-publication.dto';
 import { Types } from "mongoose";
 import { subMonths, startOfMonth, format as fmt } from "date-fns";
+import { SocketGateway } from '../socket/socket.gateway';
 @Injectable()
 export class PublicationService {
  constructor(
    @InjectModel(Publication.name) private pubModel: Model<PublicationDocument>,
+   private readonly socketGateway: SocketGateway,
  ) {}
 
 
@@ -60,7 +62,7 @@ export class PublicationService {
      })
      .populate({
        path: 'postBudget',
-       select: 'isBoosted',
+       select: 'isBoosted budget objectif depense boostPrice month',
      })
      .populate({
        path: 'lastModified',
@@ -110,6 +112,10 @@ export class PublicationService {
      .findByIdAndUpdate(id, dto, { new: true })
      .exec();
    if (!updated) throw new NotFoundException(`Publication with id ${id} not found`);
+
+    // ✅ Émettre le socket ici
+    this.socketGateway.emitUpdatePublication(updated._id.toString());
+
    return updated;
  }
 

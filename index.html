@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Test Socket Publication</title>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+  <h1>Test WebSocket Publication</h1>
+  <div id="logs"></div>
+
+  <script>
+    // Connexion au serveur Socket.io (ajuste l'URL si besoin)
+    const socket = io("http://localhost:3000");
+
+    const logs = document.getElementById("logs");
+
+    function log(message) {
+      const p = document.createElement("p");
+      p.textContent = message;
+      logs.appendChild(p);
+    }
+
+    socket.on("connect", () => {
+      log("✅ Connecté au serveur WebSocket");
+    });
+
+    socket.on("disconnect", () => {
+      log("❌ Déconnecté du serveur");
+    });
+
+    // Écoute l'événement updatePublication
+    socket.on("updatePublication", (data) => {
+      log("📝 Publication mise à jour: " + JSON.stringify(data));
+    });
+
+    // Tu peux aussi écouter createPublication si tu l’ajoutes plus tard
+    socket.on("createPublication", (data) => {
+      log("📢 Nouvelle publication: " + JSON.stringify(data));
+    });
+
+    // Et deletePublication
+    socket.on("deletePublication", (data) => {
+      log("🗑️ Publication supprimée: " + JSON.stringify(data));
+    });
+  </script>
+</body>
+</html>

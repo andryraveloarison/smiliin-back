@@ -17,6 +17,7 @@ import { MetaModule } from './modules/meta/meta.module';
 import { AiModule } from './modules/ai/ai.module';
 import { BudgetModule } from './modules/budget/budget.module';
 import { PublicationideaModule } from './modules/publicationidea/publicationidea.module';
+import { SocketModule } from './modules/socket/socket.module';
 
 @Module({
   imports: [
@@ -34,7 +35,8 @@ import { PublicationideaModule } from './modules/publicationidea/publicationidea
     MetaModule,
     AiModule,
     BudgetModule,
-    PublicationideaModule
+    PublicationideaModule,
+    SocketModule
   ],
   controllers: [AppController],
   providers: [

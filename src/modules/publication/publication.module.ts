@@ -6,6 +6,7 @@ import { PublicationController } from './publication.controller';
 import { FileService } from '../../utils/file.service';
 import { AuthModule } from '../auth/auth.module';
 import { PostBudget, PostBudgetSchema } from '../budget/schemas/postbudget.schema';
+import { SocketGateway } from '../socket/socket.gateway';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { PostBudget, PostBudgetSchema } from '../budget/schemas/postbudget.schem
     ]),    
     AuthModule
   ],
-  providers: [PublicationService, FileService],
+  providers: [PublicationService, FileService, SocketGateway],
   controllers: [PublicationController],
 })
 export class PublicationModule {}
