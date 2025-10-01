@@ -5,12 +5,13 @@ import { Descente, DescenteSchema } from './schema/descente.schema';
 import { DescenteService } from './descente.service';
 import { DescenteController } from './descente.controller';
 import { FileService } from '../../utils/file.service';
+import { SocketGateway } from '../socket/socket.gateway';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Descente.name, schema: DescenteSchema }]),
   ],
   controllers: [DescenteController],
-  providers: [DescenteService, FileService],
+  providers: [DescenteService, FileService, SocketGateway],
 })
 export class DescenteModule {}

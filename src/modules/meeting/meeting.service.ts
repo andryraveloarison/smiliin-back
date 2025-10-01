@@ -1,19 +1,28 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Meeting, MeetingDocument } from './schema/meeting.schema';
 import { subMonths, addMonths } from 'date-fns';
+import { SocketGateway } from '../socket/socket.gateway';
 
 @Injectable()
 export class MeetingService {
   constructor(
     @InjectModel(Meeting.name) private meetingModel: Model<MeetingDocument>,
+    private readonly socketGateway: SocketGateway,
+
   ) {}
 
   // ✅ Créer un meeting
   async createMeeting(data: Partial<Meeting>): Promise<Meeting> {
     const meeting = new this.meetingModel(data);
-    return meeting.save();
+    const newMeeting = await meeting.save()
+
+    this.socketGateway.emitSocket('meeting',{
+      id: newMeeting._id.toString(),
+      action: 'create'});
+
+    return newMeeting;
   }
 
   // ✅ Récupérer tous les meetings
@@ -36,6 +45,13 @@ export class MeetingService {
 
   // ✅ Mettre à jour
   async updateMeeting(id: string, data: Partial<Meeting>): Promise<Meeting> {
+
+      // 🔔 Émettre un socket pour notifier la suppression (optionnel si tu veux du temps réel)
+    this.socketGateway.emitSocket('meeting', {
+      id: id,
+      action: 'update',
+    });
+
     return this.meetingModel
       .findByIdAndUpdate(id, data, { new: true })
       .populate('userId', 'email name logo')
@@ -82,4 +98,21 @@ export class MeetingService {
       .populate('clientId', 'email name logo')
       .exec();
   }
+
+  // ✅ Supprimer un meeting
+async deleteMeeting(id: string): Promise<{ deleted: boolean }> {
+  const deleted = await this.meetingModel.findByIdAndDelete(id).exec();
+  if (!deleted) {
+    throw new NotFoundException(`Meeting with id ${id} not found`);
+  }
+
+  // 🔔 Émettre un socket pour notifier la suppression (optionnel si tu veux du temps réel)
+  this.socketGateway.emitSocket('meeting', {
+    id: id,
+    action: 'delete',
+  });
+
+  return { deleted: true };
+}
+
 }

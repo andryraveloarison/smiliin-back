@@ -4,6 +4,7 @@ import { Model, Types } from 'mongoose';
 import { PageBudget, PageBudgetDocument } from './schemas/pagebudget.schema';
 import { PostBudget, PostBudgetDocument } from './schemas/postbudget.schema';
 import { Publication, PublicationDocument } from '../publication/schema/publication.schema';
+import { SocketGateway } from '../socket/socket.gateway';
 
 @Injectable()
 export class BudgetService {
@@ -11,6 +12,8 @@ export class BudgetService {
     @InjectModel(PageBudget.name) private pageBudgetModel: Model<PageBudgetDocument>,
     @InjectModel(PostBudget.name) private postBudgetModel: Model<PostBudgetDocument>,
     @InjectModel(Publication.name) private pubModel: Model<PublicationDocument>,
+    private readonly socketGateway: SocketGateway,
+
   ) {}
 
   // ===== PageBudget =====
@@ -19,7 +22,14 @@ export class BudgetService {
       ...data,
       pageId: new Types.ObjectId(data.pageId),
     });
-    return budget.save();
+
+    const newBudget = await budget.save()
+
+    this.socketGateway.emitSocket('budgetPage',{
+      id: newBudget._id.toString(),
+      action: 'create'});
+
+    return newBudget;
   }
 
   async getPageBudgets(): Promise<PageBudget[]> {
@@ -27,10 +37,16 @@ export class BudgetService {
   }
 
   async updatePageBudget(id: string, data: Partial<PageBudget>): Promise<PageBudget> {
+    this.socketGateway.emitSocket('budgetPage',{
+      id: id,
+      action: 'update'});
     return this.pageBudgetModel.findByIdAndUpdate(id, data, { new: true }).exec();
   }
 
   async deletePageBudget(id: string): Promise<PageBudget> {
+    this.socketGateway.emitSocket('budgetPage',{
+      id: id,
+      action: 'delete'});
     return this.pageBudgetModel.findByIdAndDelete(id).exec();
   }
 
@@ -41,7 +57,14 @@ export class BudgetService {
       postId: new Types.ObjectId(data.postId),
       pageId: new Types.ObjectId(data.pageId),
     });
-    return (await budget.save()).populate('postId', 'title userId');
+
+    const newBudget = await (await budget.save()).populate('postId', 'title userId')
+
+    this.socketGateway.emitSocket('budgetPost',{
+      id: newBudget._id.toString(),
+      action: 'create'});
+
+    return newBudget;
   }
 
   async getPostBudgets(): Promise<PostBudget[]> {
@@ -51,11 +74,19 @@ export class BudgetService {
   async updatePostBudget(id: string, data: Partial<PostBudget>): Promise<PostBudget> {
     if (data.postId) data.postId = new Types.ObjectId(data.postId);
     if (data.pageId) data.pageId = new Types.ObjectId(data.pageId);
+
+    this.socketGateway.emitSocket('budgetPost',{
+      id: id,
+      action: 'update'});
+
     return this.postBudgetModel.findByIdAndUpdate(id, data, { new: true }).populate('postId', 'title userId').exec();
   }
 
 
   async deletePostBudget(id: string): Promise<PostBudget> {
+    this.socketGateway.emitSocket('budgetPost',{
+      id: id,
+      action: 'delete'});
     return this.postBudgetModel.findByIdAndDelete(id).exec();
   }
   

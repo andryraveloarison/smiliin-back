@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
 import { MeetingService } from './meeting.service';
 import { Meeting } from './schema/meeting.schema';
 
@@ -60,5 +60,10 @@ export class MeetingController {
       Number(year),
       Number(month),
     );
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: string) {
+    return this.meetingService.deleteMeeting(id);
   }
 }

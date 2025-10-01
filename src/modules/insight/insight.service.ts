@@ -4,21 +4,28 @@ import { Model, Types } from 'mongoose';
 import { Insight, InsightDocument } from './schema/insight.schema';
 import { CreateInsightDto } from './dto/create-insight.dto';
 import { UpdateInsightDto } from './dto/update-insight.dto';
+import { SocketGateway } from '../socket/socket.gateway';
 
 @Injectable()
 export class InsightService {
   constructor(
     @InjectModel(Insight.name) private insightModel: Model<InsightDocument>,
+    private readonly socketGateway: SocketGateway,
+
   ) {}
 
   async create(dto: CreateInsightDto): Promise<Insight> {
-    console.log("test")
     const created = new this.insightModel({
       ...dto,
       userId: new Types.ObjectId(dto.userId),
     });
 
-    return created.save();
+    const newInsight = await created.save()
+    this.socketGateway.emitSocket('insight',{
+      id: newInsight._id.toString(),
+      action: 'create'});
+
+    return newInsight;
   }
 
   async findAll(): Promise<Insight[]> {
@@ -36,11 +43,20 @@ export class InsightService {
       .findByIdAndUpdate(id, { ...dto }, { new: true })
       .exec();
     if (!updated) throw new NotFoundException('Insight not found');
+
+    this.socketGateway.emitSocket('insight',{
+      id: id,
+      action: 'update'});
+
     return updated;
   }
 
   async delete(id: string): Promise<void> {
     const deleted = await this.insightModel.findByIdAndDelete(id).exec();
+    this.socketGateway.emitSocket('insight',{
+      id,
+      action: 'delete'});
+
     if (!deleted) throw new NotFoundException('Insight not found');
   }
 

@@ -4,10 +4,11 @@ import { Insight, InsightSchema } from './schema/insight.schema';
 import { InsightService } from './insight.service';
 import { InsightController } from './insight.controller';
 import { FileService } from 'src/utils/file.service';
+import { SocketGateway } from '../socket/socket.gateway';
 
 @Module({
   imports: [MongooseModule.forFeature([{ name: Insight.name, schema: InsightSchema }])],
   controllers: [InsightController],
-  providers: [InsightService, FileService],
+  providers: [InsightService, FileService, SocketGateway],
 })
 export class InsightModule {}

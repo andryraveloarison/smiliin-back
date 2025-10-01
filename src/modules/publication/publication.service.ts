@@ -19,10 +19,15 @@ export class PublicationService {
 
 
  async create(dto: CreatePublicationDto): Promise<Publication> {
-   const newPub = new this.pubModel(dto);
+    let newPub = new this.pubModel(dto);
+  
+    const newPubs = await newPub.save()
+    // ✅ Émettre le socket ici
+    this.socketGateway.emitSocket('publication',{
+    id: newPubs._id.toString(),
+    action: 'create'});
 
-
-   return newPub.save();
+   return newPubs;
  }
 
 
@@ -123,8 +128,14 @@ export class PublicationService {
 
 
  async delete(id: string): Promise<{ deleted: boolean }> {
-   const result = await this.pubModel.findByIdAndDelete(id).exec();
-   if (!result) throw new NotFoundException(`Publication with id ${id} not found`);
+    const result = await this.pubModel.findByIdAndDelete(id).exec();
+    if (!result) throw new NotFoundException(`Publication with id ${id} not found`);
+
+    // ✅ Émettre le socket ici
+    this.socketGateway.emitSocket('publication',{
+    id: id,
+    action: 'delete'});
+    
    return { deleted: true };
  }
 

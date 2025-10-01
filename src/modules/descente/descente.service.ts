@@ -1,18 +1,25 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Descente, DescenteDocument } from './schema/descente.schema';
 import { subMonths, addMonths } from 'date-fns';
+import { SocketGateway } from '../socket/socket.gateway';
 
 @Injectable()
 export class DescenteService {
   constructor(
     @InjectModel(Descente.name) private descenteModel: Model<DescenteDocument>,
+    private readonly socketGateway: SocketGateway,
   ) {}
 
   async createDescente(data: Partial<Descente>): Promise<Descente> {
     const descente = new this.descenteModel(data);
-    return descente.save();
+    const newDescente = await descente.save()
+    this.socketGateway.emitSocket('descente',{
+      id: newDescente._id.toString(),
+      action: 'create'});
+
+    return newDescente;
   }
 
   async getDescentes(): Promise<Descente[]> {
@@ -32,6 +39,11 @@ export class DescenteService {
   }
 
   async updateDescente(id: string, data: Partial<Descente>): Promise<Descente> {
+
+    this.socketGateway.emitSocket('descente',{
+      id: id,
+      action: 'update'});
+
     return this.descenteModel
       .findByIdAndUpdate(id, data, { new: true })
       .populate('userId', 'email name logo')
@@ -78,4 +90,20 @@ export class DescenteService {
       .populate('clientId', 'email name logo')
       .exec();
   }
+
+  async deleteDescente(id: string): Promise<{ deleted: boolean }> {
+    const deleted = await this.descenteModel.findByIdAndDelete(id).exec();
+    if (!deleted) {
+      throw new NotFoundException(`Descente with id ${id} not found`);
+    }
+  
+    // 🔔 Emettre le socket pour notifier la suppression
+    this.socketGateway.emitSocket('descente', {
+      id: id,
+      action: 'delete',
+    });
+  
+    return { deleted: true };
+  }
+  
 }

@@ -8,6 +8,7 @@ import {
   Param,
   UseInterceptors,
   UploadedFiles,
+  Delete,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { DescenteService } from './descente.service';
@@ -72,12 +73,20 @@ export class DescenteController {
     return this.descenteService.getDescenteById(id);
   }
 
+  @Delete(':id')
+  async delete(@Param('id') id: string) {
+    return this.descenteService.deleteDescente(id);
+  }
+
+  
+
   // ✅ GET all by user
   @Get('user/:userId')
   async getAllByUser(@Param('userId') userId: string) {
     return this.descenteService.getAllByUser(userId);
   }
 
+  
   // ✅ GET last months by user (par défaut 5 mois avant/après)
   @Get('user/:userId/last-months/:months?')
   async getByUserLastMonths(

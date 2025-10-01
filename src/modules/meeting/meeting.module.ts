@@ -4,12 +4,13 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Meeting, MeetingSchema } from './schema/meeting.schema';
 import { MeetingService } from './meeting.service';
 import { MeetingController } from './meeting.controller';
+import { SocketGateway } from '../socket/socket.gateway';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Meeting.name, schema: MeetingSchema }]),
   ],
   controllers: [MeetingController],
-  providers: [MeetingService],
+  providers: [MeetingService, SocketGateway],
 })
 export class MeetingModule {}

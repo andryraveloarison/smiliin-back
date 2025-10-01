@@ -6,6 +6,7 @@ import { BudgetController } from './budget.controller';
 import { PageBudget, PageBudgetSchema } from './schemas/pagebudget.schema';
 import { PostBudget, PostBudgetSchema } from './schemas/postbudget.schema';
 import { Publication, PublicationSchema } from '../publication/schema/publication.schema';
+import { SocketGateway } from '../socket/socket.gateway';
 
 @Module({
   imports: [
@@ -16,7 +17,7 @@ import { Publication, PublicationSchema } from '../publication/schema/publicatio
 
     ]),
   ],
-  providers: [BudgetService],
+  providers: [BudgetService, SocketGateway],
   controllers: [BudgetController],
   exports: [BudgetService],
 })
