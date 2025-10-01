@@ -17,20 +17,34 @@ export class PublicationIdeaService {
     if (!ideaId) {
       throw new Error('Une publication doit avoir au moins une idée');
     }
-
-    const newPubIdea = new this.publicationIdeaModel({
-      publication: new Types.ObjectId(publicationId),
-      ideas: [new Types.ObjectId(ideaId)], // au moins une idée
-    });
-
-    return newPubIdea.save();
+  
+    // Vérifie si un PublicationIdea existe déjà pour cette publication
+    let pubIdea = await this.publicationIdeaModel.findOne({ publication: new Types.ObjectId(publicationId)  });
+  
+    if (pubIdea) {
+      // Si l'idée n'existe pas déjà dans le tableau, on l'ajoute
+      if (!pubIdea.ideas.includes(new Types.ObjectId(ideaId))) {
+        pubIdea.ideas.push(new Types.ObjectId(ideaId));
+      }
+    } else {
+      // Sinon, on crée un nouveau document
+      pubIdea = new this.publicationIdeaModel({
+        publication: new Types.ObjectId(publicationId),
+        ideas: [new Types.ObjectId(ideaId)],
+      });
+    }
+  
+    return pubIdea.save();
   }
 
 
   // Ajouter une idée en utilisant publicationId
   async addIdea(publicationId: string, ideaId: string): Promise<PublicationIdea> {
+
+    
     // Récupère le PublicationIdea lié à la publication
-    const pubIdea = await this.publicationIdeaModel.findOne({ publication: publicationId });
+    const pubIdea = await this.publicationIdeaModel.findOne({ publication: new Types.ObjectId(publicationId)  });
+
     if (!pubIdea) throw new NotFoundException('PublicationIdea not found for this publication');
 
     // Ajoute l'idée si elle n'est pas déjà dans le tableau
@@ -43,7 +57,7 @@ export class PublicationIdeaService {
 
   // Supprimer une idée en utilisant publicationId
   async removeIdea(publicationId: string, ideaId: string): Promise<PublicationIdea> {
-    const pubIdea = await this.publicationIdeaModel.findOne({ publication: publicationId });
+    const pubIdea = await this.publicationIdeaModel.findOne({ publication: new Types.ObjectId(publicationId) });
     if (!pubIdea) throw new NotFoundException('PublicationIdea not found for this publication');
 
     // Filtrer le tableau pour enlever l'idée
