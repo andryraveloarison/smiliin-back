@@ -25,6 +25,7 @@ export class PublicationService {
     // ✅ Émettre le socket ici
     this.socketGateway.emitSocket('publication',{
     id: newPubs._id.toString(),
+    userId: newPubs.userId.toString(),
     action: 'create'});
 
    return newPubs;
@@ -115,28 +116,33 @@ export class PublicationService {
  }
 
 
- async update(id: string, dto: UpdatePublicationDto): Promise<Publication> {
+ async update(id: string, dto: UpdatePublicationDto, updatedBy: string): Promise<Publication> {
    const updated = await this.pubModel
      .findByIdAndUpdate(id, dto, { new: true })
      .exec();
    if (!updated) throw new NotFoundException(`Publication with id ${id} not found`);
 
+  
+
     // ✅ Émettre le socket ici
     this.socketGateway.emitSocket('publication',{
       id: updated._id.toString(),
-      action: 'update'});
+      action: 'update',
+      userId: updatedBy
+    });
 
    return updated;
  }
 
 
- async delete(id: string): Promise<{ deleted: boolean, id: string }> {
+ async delete(id: string,deletedBy: string): Promise<{ deleted: boolean, id: string }> {
     const result = await this.pubModel.findByIdAndDelete(id).exec();
     if (!result) throw new NotFoundException(`Publication with id ${id} not found`);
 
     // ✅ Émettre le socket ici
     this.socketGateway.emitSocket('publication',{
     id: id,
+    userId: deletedBy,
     action: 'delete'});
     
    return { deleted: true , id};

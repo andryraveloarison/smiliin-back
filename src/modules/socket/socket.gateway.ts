@@ -10,6 +10,7 @@ import {
   interface socketInterface {
     action: string,
     id?:string
+    userId?: string
   }
 
   @WebSocketGateway({

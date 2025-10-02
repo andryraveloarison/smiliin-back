@@ -9,6 +9,7 @@ import {
     UploadedFiles,
     UseInterceptors,
     UseGuards,
+    Req,
   } from '@nestjs/common';
   import { FileFieldsInterceptor } from '@nestjs/platform-express';
   import { PublicationService } from './publication.service';
@@ -16,6 +17,7 @@ import {
   import { UpdatePublicationDto } from './dto/update-publication.dto';
   import { FileService } from '../../utils/file.service';
 import { JwtAuthGuard } from 'src/guards/auth.guard';
+import { JwtPayload } from 'jsonwebtoken';
 
   @UseGuards(JwtAuthGuard) // ✅ Protection par token
 
@@ -45,6 +47,8 @@ import { JwtAuthGuard } from 'src/guards/auth.guard';
         }
         dto.images = urls;
       }
+
+
       return this.pubService.create(dto);
     }
   
@@ -59,30 +63,33 @@ import { JwtAuthGuard } from 'src/guards/auth.guard';
     }
   
     @Put(':id')
+    @UseGuards(JwtAuthGuard)
     @UseInterceptors(FileFieldsInterceptor([{ name: 'images', maxCount: 5 }]))
     async update(
       @Param('id') id: string,
       @Body() dto: UpdatePublicationDto,
-      @UploadedFiles() files?: { images?: Express.Multer.File[] },
+      @UploadedFiles() files: { images?: Express.Multer.File[] } | undefined, // ⚡️ plus de "?"
+      @Req() req: Request & { user: JwtPayload },
     ) {
       if (files?.images) {
         const urls: string[] = [];
         for (const file of files.images) {
-          const url = await this.fileService.uploadFile(
-            file.buffer,
-            file.originalname,
-            'post',
-          );
+          const url = await this.fileService.uploadFile(file.buffer, file.originalname, 'post');
           urls.push(url);
         }
         dto.images = urls;
       }
-      return this.pubService.update(id, dto);
+
+      return this.pubService.update(id, dto, req.user.id);
     }
+    
   
     @Delete(':id')
-    async remove(@Param('id') id: string) {
-      return this.pubService.delete(id);
+    async remove(
+      @Param('id') id: string,       
+      @Req() req: Request & { user: JwtPayload },
+  ) {
+      return this.pubService.delete(id, req.user.id);
     }
 
 
