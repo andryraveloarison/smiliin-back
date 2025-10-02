@@ -130,7 +130,7 @@ export class PublicationService {
  }
 
 
- async delete(id: string): Promise<{ deleted: boolean }> {
+ async delete(id: string): Promise<{ deleted: boolean, id: string }> {
     const result = await this.pubModel.findByIdAndDelete(id).exec();
     if (!result) throw new NotFoundException(`Publication with id ${id} not found`);
 
@@ -139,7 +139,7 @@ export class PublicationService {
     id: id,
     action: 'delete'});
     
-   return { deleted: true };
+   return { deleted: true , id};
  }
 
 
