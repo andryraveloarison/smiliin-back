@@ -13,7 +13,7 @@ export class IdeaService {
   
   ) {}
 
-  async create(data: Partial<Idea>): Promise<Idea> {
+  async create(data: Partial<Idea>, createBy: string): Promise<Idea> {
     const idea = new this.ideaModel(data);
     const ideaSaved = await idea.save()
 
@@ -25,6 +25,7 @@ export class IdeaService {
 
     this.socketGateway.emitSocket('Idea',{
       id: ideaReturn._id.toString(),
+      userId: createBy,
       action:'create'});
     
     return ideaReturn;
@@ -49,7 +50,7 @@ export class IdeaService {
     return idea;
   }
 
-  async update(id: string, data: Partial<Idea>): Promise<Idea> {
+  async update(id: string, data: Partial<Idea>, updateBy: string): Promise<Idea> {
     const idea = await this.ideaModel
       .findByIdAndUpdate(id, data, { new: true })
       .populate('category')
@@ -60,15 +61,17 @@ export class IdeaService {
 
     this.socketGateway.emitSocket('Idea',{
       id,
+      userId: updateBy,
       action:'update'});
 
     return idea;
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: string, deleteBy: string): Promise<void> {
     const result = await this.ideaModel.findByIdAndDelete(id).exec();
     this.socketGateway.emitSocket('Idea',{
       id,
+      userId: deleteBy,
       action:'delete'});
 
     if (!result) throw new NotFoundException('Idea not found');

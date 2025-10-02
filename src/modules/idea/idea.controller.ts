@@ -10,12 +10,14 @@ import {
     UploadedFiles,
     UseInterceptors,
     UseGuards,
+    Req,
   } from '@nestjs/common';
   import { FileFieldsInterceptor } from '@nestjs/platform-express';
   import { IdeaService } from './idea.service';
   import { Idea } from './schema/idea.schema';
   import { FileService } from '../../utils/file.service';
 import { JwtAuthGuard } from 'src/guards/auth.guard';
+import { JwtPayload } from 'jsonwebtoken';
   
   @Controller('ideas')
   export class IdeaController {
@@ -30,7 +32,9 @@ import { JwtAuthGuard } from 'src/guards/auth.guard';
     @UseInterceptors(FileFieldsInterceptor([{ name: 'images', maxCount: 5 }]))
     async create(
       @Body() data: Partial<Idea>,
+      @Req() req: Request & { user: JwtPayload },
       @UploadedFiles() files?: { images?: Express.Multer.File[] },
+      
     ) {
       if (files?.images) {
         const urls: string[] = [];
@@ -44,7 +48,7 @@ import { JwtAuthGuard } from 'src/guards/auth.guard';
         }
         data.images = urls;
       }
-      return this.ideaService.create(data);
+      return this.ideaService.create(data, req.user.id);
     }
   
     // READ all
@@ -65,6 +69,7 @@ import { JwtAuthGuard } from 'src/guards/auth.guard';
     async update(
       @Param('id') id: string,
       @Body() data: Partial<Idea>,
+      @Req() req: Request & { user: JwtPayload },
       @UploadedFiles() files?: { images?: Express.Multer.File[] },
     ) {
       if (files?.images) {
@@ -79,13 +84,17 @@ import { JwtAuthGuard } from 'src/guards/auth.guard';
         }
         data.images = urls;
       }
-      return this.ideaService.update(id, data);
+      return this.ideaService.update(id, data, req.user.id);
     }
   
     // DELETE
     @Delete(':id')
-    async remove(@Param('id') id: string) {
-      return this.ideaService.remove(id);
+    async remove(
+      @Param('id') id: string,
+      @Req() req: Request & { user: JwtPayload }
+    
+    ) {
+      return this.ideaService.remove(id, req.user.id);
     }
 
     @Post('generate')
