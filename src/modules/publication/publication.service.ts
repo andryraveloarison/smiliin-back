@@ -67,7 +67,7 @@ export class PublicationService {
      })
      .populate({
        path: 'postBudget',
-       select: 'isBoosted budget objectif depense boostPrice month',
+       select: 'isBoosted budget objectif depense boostPrice month pageId',
      })
      .populate({
        path: 'lastModified',
@@ -89,24 +89,27 @@ export class PublicationService {
 
   async findOne(id: string): Promise<Publication> {
    const pub = await this.pubModel.findById(id)
-   .populate({
-     path: 'publicationIdeas',
-     populate: {
-       path: 'ideas',
-       select: 'id title images type', // champs utiles de Idea
-     },
-   })
-       .populate({
-     path: 'postBudget', // <--- virtual populate
-     select: 'objectif budget depense isBoosted boostPrice month pageId id',
-   }).populate({
-     path: 'lastModified',
-     select: 'action createdAt',
-     populate: {
-       path: 'user',          
-       select: 'email name logo',  
-     },
-   }).exec();
+   .populate('userId', 'id name email logo')
+     .populate({
+       path: 'publicationIdeas',
+       populate: {
+         path: 'ideas',
+         select: 'id title images type',
+       },
+     })
+     .populate({
+       path: 'postBudget',
+       select: 'isBoosted budget objectif depense boostPrice month pageId',
+     })
+     .populate({
+       path: 'lastModified',
+       select: 'action createdAt',
+       populate: {
+         path: 'user',
+         select: 'email name logo',
+       },
+     })
+     .exec();
    if (!pub) throw new NotFoundException(`Publication with id ${id} not found`);
    return pub;
  }
