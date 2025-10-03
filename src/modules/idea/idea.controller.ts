@@ -48,6 +48,9 @@ import { JwtPayload } from 'jsonwebtoken';
         }
         data.images = urls;
       }
+
+      console.log(req.user)
+
       return this.ideaService.create(data, req.user.id);
     }
   
@@ -63,6 +66,7 @@ import { JwtPayload } from 'jsonwebtoken';
       return this.ideaService.findOne(id);
     }
   
+
     // UPDATE (upload une ou plusieurs images)
     @Put(':id')
     @UseInterceptors(FileFieldsInterceptor([{ name: 'images', maxCount: 5 }]))
@@ -83,11 +87,10 @@ import { JwtPayload } from 'jsonwebtoken';
           urls.push(url);
         }
         data.images = urls;
+        
       }
 
-      console.log("UPDATE IDEA CONTROLLER")
-
-      return this.ideaService.update(id, data, req.user.id);
+      return this.ideaService.update(id, data);
     }
   
     // DELETE

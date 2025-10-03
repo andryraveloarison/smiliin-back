@@ -30,6 +30,8 @@ export async function generateWithGemini(prompt: string): Promise<{ url: string 
 
     const data = response.data as any;
 
+    console.log(data)
+
     const choices = data.choices;
 
     if (!choices || choices.length === 0) {

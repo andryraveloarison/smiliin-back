@@ -50,7 +50,7 @@ export class IdeaService {
     return idea;
   }
 
-  async update(id: string, data: Partial<Idea>, updateBy: string): Promise<Idea> {
+  async update(id: string, data: any, updateBy?: string): Promise<Idea> {
 
     console.log("UPDATE IDEA SERVICE")
     const idea = await this.ideaModel
