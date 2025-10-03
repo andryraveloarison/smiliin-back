@@ -91,7 +91,7 @@ export class DescenteService {
       .exec();
   }
 
-  async deleteDescente(id: string): Promise<{ deleted: boolean }> {
+  async deleteDescente(id: string): Promise<{ deleted: boolean, id: string}> {
     const deleted = await this.descenteModel.findByIdAndDelete(id).exec();
     if (!deleted) {
       throw new NotFoundException(`Descente with id ${id} not found`);
@@ -103,7 +103,7 @@ export class DescenteService {
       action: 'delete',
     });
   
-    return { deleted: true };
+    return { deleted: true, id };
   }
   
 }

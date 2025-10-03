@@ -51,6 +51,8 @@ export class IdeaService {
   }
 
   async update(id: string, data: Partial<Idea>, updateBy: string): Promise<Idea> {
+
+    console.log("UPDATE IDEA SERVICE")
     const idea = await this.ideaModel
       .findByIdAndUpdate(id, data, { new: true })
       .populate('category')

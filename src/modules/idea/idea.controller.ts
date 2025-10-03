@@ -84,6 +84,9 @@ import { JwtPayload } from 'jsonwebtoken';
         }
         data.images = urls;
       }
+
+      console.log("UPDATE IDEA CONTROLLER")
+
       return this.ideaService.update(id, data, req.user.id);
     }
   
