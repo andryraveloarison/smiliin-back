@@ -64,6 +64,7 @@ import { JwtPayload } from 'jsonwebtoken';
     }
   
     // UPDATE (upload une ou plusieurs images)
+    @UseGuards(JwtAuthGuard) // ✅ Protection par token
     @Put(':id')
     @UseInterceptors(FileFieldsInterceptor([{ name: 'images', maxCount: 5 }]))
     async update(
