@@ -49,8 +49,6 @@ import { JwtPayload } from 'jsonwebtoken';
         data.images = urls;
       }
 
-      console.log(req.user)
-
       return this.ideaService.create(data, req.user.id);
     }
   
@@ -68,6 +66,7 @@ import { JwtPayload } from 'jsonwebtoken';
   
 
     // UPDATE (upload une ou plusieurs images)
+    @UseGuards(JwtAuthGuard) // ✅ Protection par token
     @Put(':id')
     @UseInterceptors(FileFieldsInterceptor([{ name: 'images', maxCount: 5 }]))
     async update(
@@ -90,7 +89,7 @@ import { JwtPayload } from 'jsonwebtoken';
         
       }
 
-      return this.ideaService.update(id, data);
+      return this.ideaService.update(id, data, req.user.id);
     }
   
     // DELETE
