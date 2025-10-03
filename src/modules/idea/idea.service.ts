@@ -13,7 +13,7 @@ export class IdeaService {
   
   ) {}
 
-  async create(data: Partial<Idea>, createBy: string): Promise<Idea> {
+  async create(data: Partial<Idea>, createBy?: string): Promise<Idea> {
     const idea = new this.ideaModel(data);
     const ideaSaved = await idea.save()
 
