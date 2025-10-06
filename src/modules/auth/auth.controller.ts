@@ -18,9 +18,7 @@ export class AuthController {
     // Pour test, juste retourner ces infos avec l'utilisateur authentifié
     const user = await this.authService.login(dto.email, dto.code); // ton login habituel
 
-    return {
-      user
-    };
+    return user;
   }
 
   @UseGuards(JwtAuthGuard)
