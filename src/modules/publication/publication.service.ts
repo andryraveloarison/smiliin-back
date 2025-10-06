@@ -15,14 +15,14 @@ export class PublicationService {
  ) {}
 
 
- async create(dto: CreatePublicationDto): Promise<Publication> {
+ async create(dto: CreatePublicationDto,createdBy: string): Promise<Publication> {
     let newPub = new this.pubModel(dto);
   
     const newPubs = await newPub.save()
     // ✅ Émettre le socket ici
     this.socketGateway.emitSocket('publication',{
     id: newPubs._id.toString(),
-    userId: newPubs.userId.toString(),
+    userId: createdBy,
     action: 'create'});
 
    return newPubs;

@@ -30,10 +30,13 @@ import { JwtPayload } from 'jsonwebtoken';
   
     // CREATE (avec upload multiple images)
     @Post()
+    @UseGuards(JwtAuthGuard)
     @UseInterceptors(FileFieldsInterceptor([{ name: 'images', maxCount: 5 }]))
     async create(
       @Body() dto: CreatePublicationDto,
+      @Req() req: Request & { user: JwtPayload },
       @UploadedFiles() files?: { images?: Express.Multer.File[] },
+
     ) {
       if (files?.images) {
         const urls: string[] = [];
@@ -49,7 +52,7 @@ import { JwtPayload } from 'jsonwebtoken';
       }
 
 
-      return this.pubService.create(dto);
+      return this.pubService.create(dto,req.user.id);
     }
   
     @Get()
