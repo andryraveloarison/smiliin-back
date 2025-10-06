@@ -15,14 +15,14 @@ dotenv.config(); // ⚡ charge .env
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  // Autoriser CORS
-  // app.enableCors({
-  //   origin: 'http://localhost:3000', // ton front React
-  //   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  //   credentials: true, // si tu veux envoyer des cookies ou headers auth
-  // });
+  //Autoriser CORS
+  app.enableCors({
+    origin: '*', // ton front React
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true, // si tu veux envoyer des cookies ou headers auth
+  });
 
-  app.enableCors();
+  //app.enableCors();
 
   // Utiliser morgan
   app.use(morgan('combined'));
