@@ -17,15 +17,40 @@ export class PublicationService {
 
  async create(dto: CreatePublicationDto,createdBy: string): Promise<Publication> {
     let newPub = new this.pubModel(dto);
+
   
     const newPubs = await newPub.save()
+
+    const pub = await this.pubModel.findById(newPubs.id)
+    .populate('userId', 'id name email logo')
+      .populate({
+        path: 'publicationIdeas',
+        populate: {
+          path: 'ideas',
+          select: 'id title images type',
+        },
+      })
+      .populate({
+        path: 'postBudget',
+        select: 'isBoosted budget objectif depense boostPrice month pageId',
+      })
+      .populate({
+        path: 'lastModified',
+        select: 'action createdAt',
+        populate: {
+          path: 'user',
+          select: 'email name logo',
+        },
+      })
+      .exec();
+
     // ✅ Émettre le socket ici
     this.socketGateway.emitSocket('publication',{
     id: newPubs._id.toString(),
     userId: createdBy,
     action: 'create'});
 
-   return newPubs;
+   return pub;
  }
 
 
