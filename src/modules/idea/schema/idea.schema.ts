@@ -1,4 +1,3 @@
-// src/ideas/schema/idea.schema.ts
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
@@ -24,6 +23,10 @@ export class Idea {
 
   @Prop({ type: Types.ObjectId, ref: 'Category' })
   category: Types.ObjectId;
+
+  // Nouvelle date optionnelle
+  @Prop({ type: Date, required: false })
+  ideaDate?: Date;
 }
 
 export const IdeaSchema = SchemaFactory.createForClass(Idea);
