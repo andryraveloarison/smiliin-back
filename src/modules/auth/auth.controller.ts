@@ -13,24 +13,13 @@ export class AuthController {
   ) {}
 
   @Post('login')
-  async login(@Body() dto: LoginDto, @Req() req: Request) {
-    // Récupérer les infos de l'appareil
-    const userAgent = req.headers['user-agent'] as string;
-    const ip = req.ip || req.headers['x-forwarded-for'] || null;
-
-    // Si le client fournit un deviceId, on peut aussi le récupérer
-    const deviceId = (dto as any).deviceId || null;
+  async login(@Body() dto: LoginDto) {
 
     // Pour test, juste retourner ces infos avec l'utilisateur authentifié
     const user = await this.authService.login(dto.email, dto.code); // ton login habituel
 
     return {
-      user,
-      device: {
-        deviceId,
-        userAgent,
-        ip,
-      },
+      user
     };
   }
 
