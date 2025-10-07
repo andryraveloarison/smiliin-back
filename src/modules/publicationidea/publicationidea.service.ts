@@ -76,6 +76,7 @@ export class PublicationIdeaService {
       id: publicationId,
       action: 'delete'});
 
+    
     return pubIdea.save();
   }
 
@@ -98,9 +99,9 @@ export class PublicationIdeaService {
       .exec();
   }
 
-  async delete(id: string): Promise<{ deleted: boolean }> {
+  async delete(id: string): Promise<{ deleted: boolean, id: string }> {
     const result = await this.publicationIdeaModel.findByIdAndDelete(id).exec();
     if (!result) throw new NotFoundException(`PublicationIdea with id ${id} not found`);
-    return { deleted: true };
+    return { deleted: true, id };
   }
 }
