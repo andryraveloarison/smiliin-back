@@ -69,7 +69,7 @@ export class IdeaService {
     return idea;
   }
 
-  async remove(id: string, deleteBy: string): Promise<void> {
+  async remove(id: string, deleteBy: string): Promise<{deleted: boolean, id: string}> {
     const result = await this.ideaModel.findByIdAndDelete(id).exec();
     this.socketGateway.emitSocket('Idea',{
       id,
@@ -77,6 +77,9 @@ export class IdeaService {
       action:'delete'});
 
     if (!result) throw new NotFoundException('Idea not found');
+
+    return { deleted: true , id};
+
   }
 
 
