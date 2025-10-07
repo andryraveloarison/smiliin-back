@@ -19,6 +19,12 @@ export class PageBudget {
 
   @Prop({ required: true })
   month: string; // ex: "septembre 2025"
+
+  @Prop({ required: true })
+  startDate: Date;
+
+  @Prop({ required: true })
+  endDate: Date;
 }
 
 export const PageBudgetSchema = SchemaFactory.createForClass(PageBudget);

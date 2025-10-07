@@ -2,6 +2,7 @@ import { Controller, Get, Post, Put, Body, Param, Query, Delete } from '@nestjs/
 import { BudgetService } from './budget.service';
 import { PageBudget } from './schemas/pagebudget.schema';
 import { PostBudget } from './schemas/postbudget.schema';
+import { GlobalBudget } from './schemas/globalbudget.schema';
 
 @Controller('budgets')
 export class BudgetController {
@@ -48,6 +49,27 @@ export class BudgetController {
   @Delete('post/:id')
   async deletePostBudget(@Param('id') id: string) {
     return this.budgetService.deletePostBudget(id);
+  }
+
+  // ===== GlobalBudget =====
+  @Post('global')
+  async createGlobalBudget(@Body() body: Partial<GlobalBudget>) {
+    return this.budgetService.createGlobalBudget(body);
+  }
+
+  @Get('global')
+  async getGlobalBudgets() {
+    return this.budgetService.getGlobalBudgets();
+  }
+
+  @Put('global/:id')
+  async updateGlobalBudget(@Param('id') id: string, @Body() body: Partial<GlobalBudget>) {
+    return this.budgetService.updateGlobalBudget(id, body);
+  }
+
+  @Delete('global/:id')
+  async deleteGlobalBudget(@Param('id') id: string) {
+    return this.budgetService.deleteGlobalBudget(id);
   }
 
   // ===== Combinaison Page + Post =====

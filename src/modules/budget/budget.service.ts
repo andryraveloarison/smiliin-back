@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { PageBudget, PageBudgetDocument } from './schemas/pagebudget.schema';
 import { PostBudget, PostBudgetDocument } from './schemas/postbudget.schema';
+import { GlobalBudget, GlobalBudgetDocument } from './schemas/globalbudget.schema';
 import { Publication, PublicationDocument } from '../publication/schema/publication.schema';
 import { SocketGateway } from '../socket/socket.gateway';
 
@@ -11,9 +12,9 @@ export class BudgetService {
   constructor(
     @InjectModel(PageBudget.name) private pageBudgetModel: Model<PageBudgetDocument>,
     @InjectModel(PostBudget.name) private postBudgetModel: Model<PostBudgetDocument>,
+    @InjectModel(GlobalBudget.name) private globalBudgetModel: Model<GlobalBudgetDocument>,
     @InjectModel(Publication.name) private pubModel: Model<PublicationDocument>,
     private readonly socketGateway: SocketGateway,
-
   ) {}
 
   // ===== PageBudget =====
@@ -89,6 +90,46 @@ export class BudgetService {
       action: 'delete'});
     return this.postBudgetModel.findByIdAndDelete(id).exec();
   }
+
+  // ===== GlobalBudget =====
+  async createGlobalBudget(data: Partial<GlobalBudget>): Promise<GlobalBudget> {
+    const budget = new this.globalBudgetModel({
+      ...data,
+      pageId: new Types.ObjectId(data.pageId),
+    });
+
+    const newBudget = await budget.save();
+
+    this.socketGateway.emitSocket('budgetGlobal', {
+      id: newBudget._id.toString(),
+      action: 'create'
+    });
+
+    return newBudget;
+  }
+
+  async getGlobalBudgets(): Promise<GlobalBudget[]> {
+    return this.globalBudgetModel.find().exec();
+  }
+
+  async updateGlobalBudget(id: string, data: Partial<GlobalBudget>): Promise<GlobalBudget> {
+    if (data.pageId) data.pageId = new Types.ObjectId(data.pageId);
+    
+    this.socketGateway.emitSocket('budgetGlobal', {
+      id: id,
+      action: 'update'
+    });
+    
+    return this.globalBudgetModel.findByIdAndUpdate(id, data, { new: true }).exec();
+  }
+
+  async deleteGlobalBudget(id: string): Promise<GlobalBudget> {
+    this.socketGateway.emitSocket('budgetGlobal', {
+      id: id,
+      action: 'delete'
+    });
+    return this.globalBudgetModel.findByIdAndDelete(id).exec();
+  }
   
   // ===== Page + Post par mois et pageId =====
   async getBudgetsByPageAndMonth(pageId: string, month: string) {
@@ -99,6 +140,9 @@ export class BudgetService {
       .find({ pageId: pageObjId, month })
       .populate('postId', 'title userId') // récupère le titre et le user de la publication
       .exec();
+
+  
+    const globalBudget = await this.globalBudgetModel.findOne({ pageId: pageObjId, month }).exec();
 
     // Calcul des totaux
     const totalPageBudget = pageBudgets.reduce((acc, b) => acc + b.budget, 0);
@@ -111,12 +155,13 @@ export class BudgetService {
     //const totalDepense = totalPageDepense + totalPostDepense;
     //const ecart = totalBudget - totalDepense;
 
-    const ecart=totalPageBudget-totalPageDepense
+    const ecart = totalPageBudget - totalPageDepense;
     
 
     return {
       pageBudgets,
       postBudgets,
+      globalBudget,
       resume: {
         totalPageBudget, 
         totalPageDepense,
