@@ -70,7 +70,9 @@ export class IdeaService {
   }
 
   async remove(id: string, deleteBy: string): Promise<{deleted: boolean, id: string}> {
+
     const result = await this.ideaModel.findByIdAndDelete(id).exec();
+
     this.socketGateway.emitSocket('Idea',{
       id,
       userId: deleteBy,
@@ -83,29 +85,4 @@ export class IdeaService {
   }
 
 
-   // ⚡ Génération d’image sans insert
-   async generate(prompt: string): Promise<{ url: string }> {
-    try {
-      const response = await axios.post<any>(
-        'https://api.infip.pro/v1/images/generations',
-        {
-          model: 'img3',
-          prompt,
-          n: 1,
-          size: '1024x1024',
-        },
-        {
-          headers: {
-            Authorization: `Bearer infip-ac0f0147`,
-            'Content-Type': 'application/json',
-          },
-        },
-      );
-
-      return { url: response.data.data[0].url };
-    } catch (error) {
-      console.error('Erreur génération image:', error.response?.data || error);
-      throw new Error('Impossible de générer l’image');
-    }
-  }
 }

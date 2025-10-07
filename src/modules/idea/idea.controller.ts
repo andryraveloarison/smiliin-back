@@ -89,19 +89,17 @@ import { JwtPayload } from 'jsonwebtoken';
     }
   
     // DELETE
+    @UseGuards(JwtAuthGuard) // ✅ Protection par token
     @Delete(':id')
     async remove(
       @Param('id') id: string,
-      @Req() req: Request & { user: JwtPayload }
+      @Req() req: Request & { user: JwtPayload },
     
     ) {
+
       return this.ideaService.remove(id, req.user.id);
     }
 
-    @Post('generate')
-    async generateImage(@Body('prompt') prompt: string) {
-      return this.ideaService.generate(prompt);
-    }
   
   }
    
