@@ -2,6 +2,7 @@ import { Controller, Post, Body, Get, UseGuards, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from '../../guards/auth.guard';
 import { LoginDto } from './dto/login.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { Request } from 'express';
 import { UserService } from '../user/user.service';
 
@@ -26,7 +27,18 @@ export class AuthController {
   async me(@Req() request: Request) {
     // request.user est défini par le JwtAuthGuard
     const user = await this.userService.findOne((request.user as any).id);
-
     return { user };
+  }
+
+  @Post('refresh')
+  async refresh(@Body() refreshTokenDto: RefreshTokenDto) {
+    return this.authService.refreshAccessToken(refreshTokenDto.refresh_token);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('logout')
+  async logout(@Req() request: Request, @Body() { refresh_token }: RefreshTokenDto) {
+    await this.authService.revokeRefreshToken((request.user as any).id, refresh_token);
+    return { success: true };
   }
 }
