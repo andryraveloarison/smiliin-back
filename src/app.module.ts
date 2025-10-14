@@ -18,6 +18,7 @@ import { AiModule } from './modules/ai/ai.module';
 import { BudgetModule } from './modules/budget/budget.module';
 import { PublicationideaModule } from './modules/publicationidea/publicationidea.module';
 import { SocketModule } from './modules/socket/socket.module';
+import { DeviceModule } from './modules/device/device.module';
 
 @Module({
   imports: [
@@ -36,7 +37,8 @@ import { SocketModule } from './modules/socket/socket.module';
     AiModule,
     BudgetModule,
     PublicationideaModule,
-    SocketModule
+    SocketModule,
+    DeviceModule
   ],
   controllers: [AppController],
   providers: [

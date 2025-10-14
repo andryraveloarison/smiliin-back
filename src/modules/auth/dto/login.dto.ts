@@ -1,4 +1,5 @@
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { DeviceDto } from '../../device/dto/device.dto';
 
 export class LoginDto {
   @IsEmail()
@@ -7,4 +8,7 @@ export class LoginDto {
   @IsNotEmpty()
   @IsString()
   code: string;
+
+  @IsNotEmpty()
+  device: DeviceDto;
 }

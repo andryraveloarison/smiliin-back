@@ -1,6 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
+import { DeviceService } from '../device/device.service';
+import { DeviceDto } from '../device/dto/device.dto';
 import * as bcrypt from 'bcryptjs';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
@@ -11,6 +13,7 @@ export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly deviceService: DeviceService,
     @InjectModel(RefreshToken.name) private refreshTokenModel: Model<RefreshTokenDocument>,
   ) {}
 
@@ -25,9 +28,9 @@ export class AuthService {
     return user;
   }
 
-  async generateTokens(userId: string, email: string, role: string) {
+  async generateTokens(userId: string, email: string, role: string, deviceId: string) {
     const [accessToken, refreshToken] = await Promise.all([
-      this.generateAccessToken(userId, email, role),
+      this.generateAccessToken(userId, email, role, deviceId),
       this.generateRefreshToken(userId),
     ]);
 
@@ -37,10 +40,10 @@ export class AuthService {
     };
   }
 
-  private async generateAccessToken(userId: string, email: string, role: string): Promise<string> {
-    const payload = { id: userId, email, role };
+  private async generateAccessToken(userId: string, email: string, role: string, deviceId: string): Promise<string> {
+    const payload = { id: userId, email, role, deviceId };
     return this.jwtService.sign(payload, {
-      expiresIn: '15m', // courte durée pour l'access token
+      expiresIn: '24h', // courte durée pour l'access token
     });
   }
 
@@ -64,11 +67,27 @@ export class AuthService {
     return token;
   }
 
-  async login(email: string, code: string) {
+  async login(email: string, code: string, deviceInfo: DeviceDto) {
     const user = await this.validateUser(email, code);
     if (!user) throw new UnauthorizedException('Invalid credentials');
 
-    const tokens = await this.generateTokens(user.id, user.email, user.role);
+    // Vérifier le device
+    const existingDevice = await this.deviceService.findByIdMacAndUserId(deviceInfo.idmac, user.id);
+    
+    let deviceAccess = true;
+    if (existingDevice) {
+      deviceAccess = existingDevice.access;
+      //await this.deviceService.updateConnectionStatus(existingDevice.id.toString(), true);
+    } else {
+      const newDevice = await this.deviceService.createDevice(user.id, deviceInfo);
+      deviceAccess = newDevice.access;
+    }
+
+    if (!deviceAccess) {
+      throw new UnauthorizedException('Device not authorized');
+    }
+
+    const tokens = await this.generateTokens(user.id, user.email, user.role, existingDevice.id );
     return {
       ...tokens,
       success: true,
@@ -97,7 +116,7 @@ export class AuthService {
       }
 
       // Générer un nouveau access token
-      const accessToken = await this.generateAccessToken(user.id, user.email, user.role);
+      const accessToken = await this.generateAccessToken(user.id, user.email, user.role, decoded.deviceId);
 
       return {
         access_token: accessToken,

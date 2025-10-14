@@ -5,8 +5,6 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { ResponseInterceptor } from './interceptors/response.interceptor';
 import { AllExceptionsFilter } from './filters/all-exceptions.filter';
 import * as morgan from 'morgan';
-// import { AuditInterceptor } from './interceptors/audit.interceptor';
-// import { AuditService } from './modules/audit/audit.service';
 import * as dotenv from 'dotenv';
 
 

@@ -18,7 +18,6 @@ export class AuditInterceptor implements NestInterceptor {
     const method = req.method;
     const url = req.url;
 
-    console.log('OKE');
     console.log('User:', userId);
 
     return next.handle().pipe(
@@ -42,7 +41,6 @@ export class AuditInterceptor implements NestInterceptor {
               default:
                 action = 'Read';
             }
-
             // Identifier l’entité depuis l’URL
             const entity = url.split('/')[1] || 'Unknown';
 

@@ -2,7 +2,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Idea, IdeaDocument } from './schema/idea.schema';
-import axios from 'axios';
 import { SocketGateway } from '../socket/socket.gateway';
 
 @Injectable()
@@ -52,7 +51,6 @@ export class IdeaService {
 
   async update(id: string, data: any, updateBy?: string): Promise<Idea> {
 
-    console.log("UPDATE IDEA SERVICE")
     const idea = await this.ideaModel
       .findByIdAndUpdate(id, data, { new: true })
       .populate('category')

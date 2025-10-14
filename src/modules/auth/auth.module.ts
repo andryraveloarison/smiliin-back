@@ -3,12 +3,14 @@ import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthService } from './auth.service';
 import { UserModule } from '../user/user.module';
+import { DeviceModule } from '../device/device.module';
 import { AuthController } from './auth.controller';
 import { RefreshToken, RefreshTokenSchema } from './schemas/refresh-token.schema';
 
 @Module({
   imports: [
     forwardRef(() => UserModule), // <- ici, pour éviter la circularité
+    DeviceModule,
     MongooseModule.forFeature([
       { name: RefreshToken.name, schema: RefreshTokenSchema },
     ]),
