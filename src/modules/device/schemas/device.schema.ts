@@ -26,9 +26,11 @@ export class Device {
   @Prop({ default: false })
   access: boolean;
 
-
   @Prop({ required: false })
   pseudo?: string;
+
+  @Prop({ required: false })
+  userRole?: string;
 }
 
 export const DeviceSchema = SchemaFactory.createForClass(Device);
