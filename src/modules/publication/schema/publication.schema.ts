@@ -1,7 +1,6 @@
 // src/publication/schemas/publication.schema.ts
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { AuditLog } from '../../audit/schema/audit-log.schema';
 
 export type PublicationDocument = Publication & Document;
 

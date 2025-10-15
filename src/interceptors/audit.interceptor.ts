@@ -48,16 +48,7 @@ export class AuditInterceptor implements NestInterceptor {
             const entityId =
               result?.id || result?._id || req.params?.id || null;
 
-            // 🔹 On log seulement si ce n’est pas un "Read"
-            if (action !== 'Read' && userId) {
-              await this.auditService.log(
-                action,
-                entity,
-                entityId,
-                userId,
-                req,
-              );
-            }
+          
           } catch (e) {
             console.error('Audit log failed:', e.message);
           }
