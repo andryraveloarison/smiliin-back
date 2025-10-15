@@ -87,7 +87,9 @@ export class AuthService {
       throw new UnauthorizedException('Device not authorized');
     }
 
-    const tokens = await this.generateTokens(user.id, user.email, user.role, existingDevice.id );
+    let deviceId = existingDevice ? existingDevice.id: deviceInfo.idmac;
+
+    const tokens = await this.generateTokens(user.id, user.email, user.role, deviceId );
     return {
       ...tokens,
       success: true,

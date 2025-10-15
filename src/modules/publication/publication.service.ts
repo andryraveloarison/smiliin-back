@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Publication, PublicationDocument } from './schema/publication.schema';
@@ -78,37 +78,48 @@ export class PublicationService {
  // }
 
 
- async findAll(): Promise<any[]> {
-   const publications = await this.pubModel.find()
-     .populate('userId', 'id name email logo')
-     .populate({
-       path: 'publicationIdeas',
-       populate: {
-         path: 'ideas',
-         select: 'id title images type',
-       },
-     })
-     .populate({
-       path: 'postBudget',
-       select: 'isBoosted budget objectif depense boostPrice month pageId',
-     })
-     .populate({
-       path: 'lastModified',
-       select: 'action createdAt',
-       populate: {
-         path: 'user',
-         select: 'email name logo',
-       },
-     })
-     .exec();
 
+async findAll(): Promise<any[]> {
+  try {
 
-     return publications;
+    const publications = await this.pubModel
+      .find()
+      // 1) Auteur
+      .populate({
+        path: 'userId',
+        select: 'name email logo',        // pas besoin de 'id' ici
+        model: 'User',                    // ensure: MongooseModule.forFeature([{ name: 'User', schema: UserSchema }])
+      })
+      // 2) Idées de la publication (container)
+      .populate({
+        path: 'publicationIdeas',         // assure-toi que ce champ existe dans le schéma Publication
+        model: 'PublicationIdea',         // <-- adapte au vrai nom du modèle
+        populate: {
+          path: 'ideas',                  // champ dans PublicationIdea qui référence Idea(s)
+          select: 'title images type',
+          model: 'Idea',                  // <-- adapte si ton modèle s’appelle différemment
+        },
+      })
+      // 3) Budgets (⚠️ vérifie bien le nom: postBudget vs postBudgets)
+      .populate({
+        path: 'postBudget',              // <- si ton champ est bien au pluriel
+        select: 'isBoosted budget objectif depense boostPrice month pageId',
+        model: 'PostBudget',              // <-- adapte au nom réel du modèle
+      })
 
+      .exec();
 
-    
- }
+    return publications;
 
+  } catch (err) {
+    // Log détaillé pour voir le chemin qui coince
+    console.error('findAll publications error:', err?.message, err);
+    // Optionnel: activer le debug Mongoose pour voir les paths
+    // mongoose.set('debug', true);
+
+    throw new InternalServerErrorException(err?.message || 'Error fetching publications');
+  }
+}
 
   async findOne(id: string): Promise<Publication> {
    const pub = await this.pubModel.findById(id)
