@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Put, Body, Param, UseGuards, Req, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Put, Body, Param, UseGuards, Req, Delete, Patch, BadRequestException } from '@nestjs/common';
 import { DeviceService } from './device.service';
 import { JwtAuthGuard } from '../../guards/auth.guard';
 import { Request } from 'express';
+import { Device } from './schemas/device.schema';
 
 @Controller('devices')
 @UseGuards(JwtAuthGuard)
@@ -36,4 +37,17 @@ export class DeviceController {
         ) {
             return this.deviceService.updateAccess(deviceId, access);
     }
+
+
+  // ✅ Nouvelle route: mise à jour partielle d’un device (ex: { pseudo: 'Nouveau' })
+  @Patch(':id')
+    async updateDevice(
+        @Param('id') deviceId: string,
+        @Body() updateData: Partial<Device>, // idéalement: UpdateDeviceDto
+    ) {
+        if (!updateData || typeof updateData !== 'object') {
+        throw new BadRequestException('Corps de requête invalide');
+        }
+        return this.deviceService.updateDevice(deviceId, updateData);
+    } 
 }

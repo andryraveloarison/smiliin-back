@@ -17,14 +17,12 @@ export class AuthController {
   async login(@Body() dto: LoginDto) {
     // Pour test, juste retourner ces infos avec l'utilisateur authentifié
     const user = await this.authService.login(dto.email, dto.code, dto.device);
-
     return user;
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('me')
   async me(@Req() request: Request) {
-    // request.user est défini par le JwtAuthGuard
     const user = await this.userService.findOne((request.user as any).id);
     console.log(request.user.deviceId);
     return { user };
@@ -41,4 +39,5 @@ export class AuthController {
     await this.authService.revokeRefreshToken((request.user as any).id, refresh_token);
     return { success: true };
   }
+  
 }

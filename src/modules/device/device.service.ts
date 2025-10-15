@@ -37,6 +37,27 @@ export class DeviceService {
         return device.save();
     }
 
+    async updateDevice(deviceId: string, updateData: Partial<Device>): Promise<Device | null> {
+        // Vérifie que l’ID est bien valide
+        if (!Types.ObjectId.isValid(deviceId)) {
+            throw new BadRequestException('ID de device invalide');
+        }
+
+        // Mise à jour partielle du document
+        const updatedDevice = await this.deviceModel.findByIdAndUpdate(
+            deviceId,
+            { $set: updateData },
+            { new: true } // retourne le document mis à jour
+        );
+
+        if (!updatedDevice) {
+            throw new NotFoundException('Device non trouvé');
+        }
+
+        return updatedDevice;
+    }
+
+
     async updateConnectionStatus(deviceId: string, isConnected: boolean): Promise<Device> {
         const update = isConnected
         ? { connected: new Date() }

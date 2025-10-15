@@ -32,11 +32,7 @@ export class Publication {
 
   @Prop({ type: Types.ObjectId, ref: 'PostBudget' })
   postBudgetId: Types.ObjectId;
-
-
 }
-
-
 
 export const PublicationSchema = SchemaFactory.createForClass(Publication);
 
