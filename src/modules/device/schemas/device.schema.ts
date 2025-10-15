@@ -26,10 +26,10 @@ export class Device {
   @Prop({ default: false })
   access: boolean;
 
-  @Prop({ required: false })
+  @Prop({ required: false , default: ""})
   pseudo?: string;
 
-  @Prop({ required: false })
+  @Prop({ required: false , default: ""})
   userRole?: string;
 }
 

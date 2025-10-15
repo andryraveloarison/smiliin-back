@@ -79,10 +79,15 @@ export class DeviceService {
     }
 
     async getAllDevices(userId: string): Promise<Device[]> {
-        return this.deviceModel.find({
-        userId: new Types.ObjectId(userId),
-        }).exec();
+        return this.deviceModel
+            .find({ userId: new Types.ObjectId(userId) })
+            .populate({
+            path: 'userId',
+            select: 'name email logo', // 🟢 on choisit les champs à renvoyer
+            })
+            .exec();
     }
+
 
     async getAllByUserId(userId: string): Promise<DeviceDocument[]> {
         if (!Types.ObjectId.isValid(userId)) {
