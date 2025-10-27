@@ -7,6 +7,7 @@ import * as bcrypt from 'bcryptjs';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { RefreshToken, RefreshTokenDocument } from './schemas/refresh-token.schema';
+import { AuditEmitterService } from '../audit/audit-emitter.service';
 
 @Injectable()
 export class AuthService {
@@ -14,6 +15,8 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly deviceService: DeviceService,
+    private readonly auditEmitter: AuditEmitterService,
+
     @InjectModel(RefreshToken.name) private refreshTokenModel: Model<RefreshTokenDocument>,
   ) {}
 
@@ -68,22 +71,44 @@ export class AuthService {
   }
 
   async login(email: string, code: string, deviceInfo: DeviceDto) {
+
     const user = await this.validateUser(email, code);
+
     if (!user) throw new UnauthorizedException('Invalid credentials');
 
     // Vérifier le device
-    const existingDevice = await this.deviceService.findByIdMacAndUserId(deviceInfo.idmac, user.id);
+    let existingDevice = await this.deviceService.findByIdMacAndUserId(deviceInfo.idmac, user.id);
     
+
     let deviceAccess = true;
+
     if (existingDevice) {
       deviceAccess = existingDevice.access;
-      //await this.deviceService.updateConnectionStatus(existingDevice.id.toString(), true);
+      if(deviceAccess){
+        await this.deviceService.updateConnectionStatus(existingDevice.id.toString(), true);
+      }
     } else {
-      const newDevice = await this.deviceService.createDevice(user.id, deviceInfo);
-      deviceAccess = newDevice.access;
+
+      await this.deviceService.createDevice(user.id, deviceInfo);
+      existingDevice = await this.deviceService.findByIdMacAndUserId(deviceInfo.idmac, user.id);
+      deviceAccess = false;
     }
 
     if (!deviceAccess) {
+      
+      const receiverIds = [user.id]; // ou ta logique réelle d'admins
+
+      await this.auditEmitter.createAndNotify({
+        userId: user.id,
+        entity: 'Device',
+        idObject: existingDevice.id.toString(),
+        idmac: deviceInfo.idmac,
+        receiverIds,
+        message: `Tentative de connexion avec un appareil non autorisé: ${existingDevice.pseudo || existingDevice.idmac}`,
+        action: 'LOGIN',
+      
+      });
+
       throw new UnauthorizedException('Device not authorized');
     }
 

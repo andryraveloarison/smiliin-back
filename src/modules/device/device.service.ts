@@ -33,7 +33,7 @@ export class DeviceService {
         access,
         connected: new Date(),
         });
-
+        
         return device.save();
     }
 
@@ -87,7 +87,6 @@ export class DeviceService {
             })
             .exec();
     }
-
 
     async getAllByUserId(userId: string): Promise<DeviceDocument[]> {
         if (!Types.ObjectId.isValid(userId)) {

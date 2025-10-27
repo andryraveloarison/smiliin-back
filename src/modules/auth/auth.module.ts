@@ -6,11 +6,13 @@ import { UserModule } from '../user/user.module';
 import { DeviceModule } from '../device/device.module';
 import { AuthController } from './auth.controller';
 import { RefreshToken, RefreshTokenSchema } from './schemas/refresh-token.schema';
+import { AuditModule } from '../audit/audit.module';
 
 @Module({
   imports: [
     forwardRef(() => UserModule), // <- ici, pour éviter la circularité
     DeviceModule,
+    AuditModule,
     MongooseModule.forFeature([
       { name: RefreshToken.name, schema: RefreshTokenSchema },
     ]),

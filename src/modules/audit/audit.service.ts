@@ -1,9 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Audit, AuditDocument, AuditEntity } from './schema/audit-log.schema';
+import { AuditAction } from './audit-emitter.service';
 
-type AuditAction = 'CREATE' | 'UPDATE' | 'DELETE';
 
 @Injectable()
 export class AuditService {
@@ -19,12 +19,6 @@ export class AuditService {
     return this.auditModel
       .find({ entity, idObject: new Types.ObjectId(idObject) })
       .sort({ createdAt: -1 })
-      .populate({
-        path: 'idmac',        
-        select: 'id idmac deviceType navigator access connected disconnected',
-      })
-
-      .lean({ virtuals: true })  
       .exec();
   }
 
@@ -36,32 +30,37 @@ export class AuditService {
     idmac: string;
     modif?: Record<string, { before: any; after: any }>;
     receiverIds?: string[];
-    notification?: string;
+    notification?: string; 
   }) {
     const { userId, idObject, idmac, receiverIds = [], ...rest } = input;
 
-    const toCheck = [userId, idObject, idmac, ...receiverIds];
-    if (toCheck.some((v) => !Types.ObjectId.isValid(v))) {
-      throw new BadRequestException('Invalid ObjectId in payload');
-    }
 
     const doc = await this.auditModel.create({
       ...rest,
       userId: new Types.ObjectId(userId),
       idObject: new Types.ObjectId(idObject),
-      idmac: new Types.ObjectId(idmac),
+      idmac: idmac,
       receiverIds: receiverIds.map((id) => new Types.ObjectId(id)),
     });
 
-    const populated = await this.auditModel
-      .findById(doc._id)
-      .populate({
-        path: 'idmac',
-        select: 'id idmac deviceType navigator access connected disconnected',
-      })
-      .lean({ virtuals: true })
+
+    return doc;
+  }
+
+  async getOneById(id: string): Promise<AuditDocument> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestException('Invalid audit ID');
+    }
+
+    const audit = await this.auditModel
+      .findById(id)
       .exec();
 
-    return populated;
+      if (!audit) {
+        throw new NotFoundException(`Audit with ID ${id} not found`);
+      }
+
+
+    return audit;
   }
 }

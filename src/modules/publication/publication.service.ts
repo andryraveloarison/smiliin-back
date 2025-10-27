@@ -182,12 +182,6 @@ async findAll(): Promise<any[]> {
  }
 
 
-
-
-
-
-
-
 async findByUserMonthly(userId: string) {
  const now = new Date();
  const from = startOfMonth(subMonths(now, 9)); // début du mois il y a 9 mois
@@ -418,8 +412,6 @@ async findByUserMonthly(userId: string) {
  ]);
 }
  
-
-
 async findByUserAndMonth(userId: string, year: number, month: number) {
  const start = new Date(year, month - 1, 1, 0, 0, 0, 0);
  const end   = new Date(year, month, 0, 23, 59, 59, 999);
@@ -633,7 +625,4 @@ async findByUserAndMonth(userId: string, year: number, month: number) {
  ]);
 }
 
-
- 
- 
 }

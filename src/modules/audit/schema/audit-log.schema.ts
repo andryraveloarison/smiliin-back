@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
+import { AuditAction } from '../audit-emitter.service';
 
 export type AuditDocument = HydratedDocument<Audit>;
 
@@ -8,6 +9,7 @@ export const AUDIT_ENTITIES = [
   'Device',
   'Idea',
   'User',
+  'Auth'
 ] as const;
 export type AuditEntity = typeof AUDIT_ENTITIES[number];
 
@@ -16,8 +18,8 @@ export class Audit {
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   userId: Types.ObjectId;
 
-  @Prop({ type: String, enum: ['CREATE', 'UPDATE', 'DELETE'], required: true })
-  action: 'CREATE' | 'UPDATE' | 'DELETE';
+  @Prop({ type: String, required: true })
+  action: AuditAction;
 
   // 🔹 Nouvelle propriété : l’entité concernée
   @Prop({ type: String, enum: AUDIT_ENTITIES, required: true })
