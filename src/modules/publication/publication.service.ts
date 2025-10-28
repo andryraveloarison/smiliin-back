@@ -155,7 +155,6 @@ export class PublicationService {
       action: 'UPDATE',
       modif:{}
     })
-
     return updated;
   }
 

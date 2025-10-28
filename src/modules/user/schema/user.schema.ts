@@ -8,13 +8,13 @@ export class User {
   @Prop({ required: true })
   name: string;
 
-  @Prop({ unique: true, required: true })
+  @Prop()
   email: string;
 
   @Prop({ required: true })
   code: string;
 
-  @Prop()
+  @Prop({unique: true})
   pseudo: string;
 
   @Prop()
