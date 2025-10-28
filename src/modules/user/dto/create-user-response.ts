@@ -1,7 +1,7 @@
 export interface UserResponse {
     id: string;         
     name: string;       
-    email: string;      
+    email?: string;      
     code: string;       
     logo?: string;    
     description?: string;  
