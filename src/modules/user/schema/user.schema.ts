@@ -32,6 +32,15 @@ export class User {
 
 export const UserSchema = SchemaFactory.createForClass(User);
 
+
+// user.schema.ts
+UserSchema.virtual('devices', {
+  ref: 'Device',           // le modèle à référencer
+  localField: '_id',       // le champ du user
+  foreignField: 'userId',  // le champ correspondant dans Device
+});
+
+
 // ✅ Déclare le virtual id
 UserSchema.virtual('id').get(function (this: UserDocument) {
   return (this._id as Types.ObjectId).toHexString(); // on cast _id

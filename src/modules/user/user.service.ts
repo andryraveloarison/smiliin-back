@@ -21,7 +21,7 @@ export class UserService {
 
   // Récupérer tous les utilisateurs
   async findAll(): Promise<UserDocument[]> {
-    return this.userModel.find().exec();
+    return this.userModel.find().populate('devices').exec();
   }
 
   // Récupérer un utilisateur par ID
