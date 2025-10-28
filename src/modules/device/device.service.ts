@@ -2,11 +2,14 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Device, DeviceDocument } from './schemas/device.schema';
+import { SocketGateway } from '../socket/socket.gateway';
 
 @Injectable()
 export class DeviceService {
     constructor(
         @InjectModel(Device.name) private deviceModel: Model<DeviceDocument>,
+        private readonly socketServer: SocketGateway, // injecte ton serveur socket.io
+
     ) {}
 
     async findByIdMacAndUserId(idmac: string, userId: string): Promise<DeviceDocument | null> {
@@ -54,6 +57,14 @@ export class DeviceService {
             throw new NotFoundException('Device non trouvé');
         }
 
+            // 🔔 Vérifie si l'accès est passé à false
+        if (updateData.access === false) {
+        this.socketServer.emitSocket('deviceAccessRevoked', {
+            userId: updatedDevice.userId.toString(),
+            action: 'Disconnect',
+        });
+        
+        }
         return updatedDevice;
     }
 

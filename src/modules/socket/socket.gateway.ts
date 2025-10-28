@@ -15,7 +15,7 @@ import {
 
   @WebSocketGateway({
     cors: {
-      origin: '*', // ⚠️ en prod, mets ton domaine front
+      origin: '*',
     },
   })
   export class SocketGateway
@@ -42,7 +42,7 @@ import {
 
     emitSocket(module:string, data: socketInterface) {
         this.server.emit(module,data);
-      }
+    }
 
     emitAudit(channel: string, payload: { receiverIds: string[]; auditId: string; message: string }) {
       // Exemple 1: broadcast ciblé aux receveurs (rooms = userId)

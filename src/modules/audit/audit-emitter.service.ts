@@ -55,7 +55,6 @@ export class AuditEmitterService {
 
     console.log('Audit created with ID:', (audit as any)?.id || audit?._id?.toString());
 
-    // 2️⃣ Émettre la notification socket minimale
     this.socketGateway.emitAudit('audit', {
       receiverIds,
       auditId: (audit as any)?.id || audit?._id?.toString(),
