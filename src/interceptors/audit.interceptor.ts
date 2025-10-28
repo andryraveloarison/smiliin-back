@@ -18,7 +18,6 @@ export class AuditInterceptor implements NestInterceptor {
     const method = req.method;
     const url = req.url;
 
-    console.log('User:', userId);
 
     return next.handle().pipe(
       tap((result) => {

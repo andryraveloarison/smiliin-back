@@ -140,23 +140,46 @@ export class PublicationService {
   }
 
 
-  async update(id: string, dto: UpdatePublicationDto, updatedBy: any): Promise<Publication> {
-    const updated = await this.pubModel
-      .findByIdAndUpdate(id, dto, { new: true })
-      .exec();
-    if (!updated) throw new NotFoundException(`Publication with id ${id} not found`);    
-    await this.auditEmitter.createAndNotify({
-      userId: updatedBy.id,
-      entity: 'Publication',
-      idObject: id,
-      deviceId: updatedBy.deviceId,
-      receiverIds: [updatedBy.id, "0"],
-      message: `Publication modifie par ${updatedBy.email}`,
-      action: 'UPDATE',
-      modif:{}
-    })
-    return updated;
+// publication.service.ts (extrait)
+async update(id: string, dto: UpdatePublicationDto, updatedBy: any): Promise<Publication> {
+  // 1) récupérer l'ancien document
+  const before = await this.pubModel.findById(id).lean().exec();
+  if (!before) throw new NotFoundException(`Publication with id ${id} not found`);
+
+  // 2) appliquer la mise à jour et récupérer la version "after"
+  const updated = await this.pubModel
+    .findByIdAndUpdate(id, dto, { new: true })
+    .exec();
+  if (!updated) throw new NotFoundException(`Publication with id ${id} not found`);
+
+
+  const modifAfter: Record<string, any> = {};
+  const dtoKeys = Object.keys(dto ?? {});
+
+  for (const key of dtoKeys) {
+    const beforeVal = (before as any)[key];
+    const afterVal = (updated as any)[key];
+
+    const changed = JSON.stringify(beforeVal) !== JSON.stringify(afterVal);
+    if (changed) {
+      modifAfter[key] = afterVal;
+    }
   }
+
+  await this.auditEmitter.createAndNotify({
+    userId: updatedBy.id,
+    entity: 'Publication',
+    idObject: id,
+    deviceId: updatedBy.deviceId,
+    receiverIds: [updatedBy.id, "0"],
+    message: `Publication modifiée par ${updatedBy.email}`,
+    action: 'UPDATE',
+    modif: modifAfter, 
+  });
+
+  return updated;
+}
+
 
 
   async delete(id: string,deletedBy: any): Promise<{ deleted: boolean, id: string }> {

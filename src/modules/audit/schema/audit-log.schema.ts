@@ -34,7 +34,7 @@ export class Audit {
   @Prop({ type: Types.ObjectId,refPath: 'entity', required: true })
   idObject: Types.ObjectId;
 
-  @Prop({ type: [{ type:[ String ], ref: 'User' }] })
+@Prop({ type: [String], ref: 'User' })
   receiverIds?: string[];
 
   @Prop()
@@ -44,7 +44,7 @@ export class Audit {
   idmac: string;
 
   @Prop({ type: Object })
-  modif?: Record<string, { before: any; after: any }>;
+  modif?: Record<string, any>;
 
   @Prop({ type: Date, default: Date.now })
   createdAt: Date;

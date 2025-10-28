@@ -39,20 +39,11 @@ export class UserService {
   // Mettre à jour un utilisateur
   async update(id: string, updateData: Partial<User>): Promise<UserDocument> {
 
-    console.log('Update data received in service:', updateData);
     if (updateData.code) {
       updateData.code = await bcrypt.hash(updateData.code, 10); // hachage si mot de passe changé
     }
-    console.log('Update data after processing:', updateData);
-    let updatedUser;
-
-    try {
-          updatedUser = await this.userModel.findByIdAndUpdate(id, updateData, { new: true }).exec();
-
-    } catch (error) {
-      console.error('Error updating user:', error);
-      throw error;
-    }
+    
+    const updatedUser = await this.userModel.findByIdAndUpdate(id, updateData, { new: true }).exec();
     if (!updatedUser) throw new NotFoundException(`User with id ${id} not found`);
     return updatedUser;
   }
