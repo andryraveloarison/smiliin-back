@@ -44,7 +44,15 @@ export class UserService {
       updateData.code = await bcrypt.hash(updateData.code, 10); // hachage si mot de passe changé
     }
     console.log('Update data after processing:', updateData);
-    const updatedUser = await this.userModel.findByIdAndUpdate(id, updateData, { new: true }).exec();
+    let updatedUser;
+
+    try {
+          updatedUser = await this.userModel.findByIdAndUpdate(id, updateData, { new: true }).exec();
+
+    } catch (error) {
+      console.error('Error updating user:', error);
+      throw error;
+    }
     if (!updatedUser) throw new NotFoundException(`User with id ${id} not found`);
     return updatedUser;
   }
