@@ -84,6 +84,8 @@ export class UserController {
       );
       updateUserDto.logo = publicUrl; 
     }
+
+    console.log('Updating user with data:', updateUserDto);
     const updatedUser = await this.usersService.update(id, updateUserDto);
     if (!updatedUser) throw new NotFoundException(`User with id ${id} not found`);
     return updatedUser;
