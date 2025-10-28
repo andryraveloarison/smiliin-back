@@ -7,6 +7,7 @@ import { FileService } from '../../utils/file.service';
 import { AuthModule } from '../auth/auth.module';
 import { PostBudget, PostBudgetSchema } from '../budget/schemas/postbudget.schema';
 import { SocketGateway } from '../socket/socket.gateway';
+import { AuditModule } from '../audit/audit.module';
 
 @Module({
   imports: [
@@ -14,7 +15,8 @@ import { SocketGateway } from '../socket/socket.gateway';
       { name: Publication.name, schema: PublicationSchema },
       { name: PostBudget.name, schema: PostBudgetSchema }, // <-- IMPORTANT
     ]),    
-    AuthModule
+    AuthModule,
+    AuditModule
   ],
   providers: [PublicationService, FileService, SocketGateway],
   controllers: [PublicationController],

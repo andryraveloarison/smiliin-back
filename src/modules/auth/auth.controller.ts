@@ -15,8 +15,8 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() dto: LoginDto) {
-    // Pour test, juste retourner ces infos avec l'utilisateur authentifié
     
+    console.log('Login attempt with email:', dto.email);
     const user = await this.authService.login(dto.email, dto.code, dto.device);
     return user;
   }

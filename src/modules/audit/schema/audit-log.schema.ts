@@ -9,7 +9,12 @@ export const AUDIT_ENTITIES = [
   'Device',
   'Idea',
   'User',
-  'Auth'
+  'Auth',
+  'Meeting',
+  'Descente',
+  'Budget',
+  'Categorie',
+  'Insight',
 ] as const;
 export type AuditEntity = typeof AUDIT_ENTITIES[number];
 
@@ -26,17 +31,17 @@ export class Audit {
   entity: AuditEntity;
 
   // 🔹 L’ID de l’objet dans la collection cible
-  @Prop({ type: Types.ObjectId, required: true })
+  @Prop({ type: Types.ObjectId,refPath: 'entity', required: true })
   idObject: Types.ObjectId;
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }] })
-  receiverIds?: Types.ObjectId[];
+  @Prop({ type: [{ type:[ String ], ref: 'User' }] })
+  receiverIds?: string[];
 
   @Prop()
   notification?: string;
 
-  @Prop({ type: Types.ObjectId, ref: 'Device', required: true })
-  idmac: Types.ObjectId;
+  @Prop({ type: String,required: true })
+  idmac: string;
 
   @Prop({ type: Object })
   modif?: Record<string, { before: any; after: any }>;

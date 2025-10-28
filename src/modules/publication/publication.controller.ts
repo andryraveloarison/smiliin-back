@@ -52,7 +52,7 @@ import { JwtPayload } from 'jsonwebtoken';
       }
 
 
-      return this.pubService.create(dto,req.user.id);
+      return this.pubService.create(dto,req.user);
     }
   
     @Get()
@@ -83,7 +83,7 @@ import { JwtPayload } from 'jsonwebtoken';
         dto.images = urls;
       }
 
-      return this.pubService.update(id, dto, req.user.id);
+      return this.pubService.update(id, dto, req.user);
     }
     
   
@@ -92,7 +92,7 @@ import { JwtPayload } from 'jsonwebtoken';
       @Param('id') id: string,       
       @Req() req: Request & { user: JwtPayload },
   ) {
-      return this.pubService.delete(id, req.user.id);
+      return this.pubService.delete(id, req.user);
     }
 
 

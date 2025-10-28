@@ -3,6 +3,7 @@ import { AuditService } from './audit.service';
 import { SocketGateway } from '../socket/socket.gateway';
 import { AuditEntity } from './schema/audit-log.schema';
 import { Types } from 'mongoose';
+import { DeviceService } from '../device/device.service';
 
 export type AuditAction = 'CREATE' | 'UPDATE' | 'DELETE' | 'LOGIN' | 'LOGOUT';
 
@@ -11,6 +12,7 @@ export class AuditEmitterService {
   constructor(
     private readonly auditService: AuditService,
     private readonly socketGateway: SocketGateway,
+    private readonly deviceService: DeviceService
   ) {}
 
   /**
@@ -20,7 +22,7 @@ export class AuditEmitterService {
     userId: string;
     entity: AuditEntity;
     idObject: string;
-    idmac: string;
+    deviceId: string;
     action?: AuditAction;
     receiverIds: string[];
     message: string;
@@ -30,13 +32,15 @@ export class AuditEmitterService {
       userId,
       entity,
       idObject,
-      idmac,
+      deviceId,
       receiverIds,
       message,
       modif,
       action,
     } = options;
 
+    const device = await this.deviceService.getOneById(deviceId)
+    const idmac = device.idmac
     // 1️⃣ Créer l’audit
     const audit = await this.auditService.createAudit({
       userId,

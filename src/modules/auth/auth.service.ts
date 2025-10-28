@@ -102,7 +102,7 @@ export class AuthService {
         userId: user.id,
         entity: 'Device',
         idObject: existingDevice.id.toString(),
-        idmac: deviceInfo.idmac,
+        deviceId: existingDevice.id.toString(),
         receiverIds,
         message: `Tentative de connexion avec un appareil non autorisé: ${existingDevice.pseudo || existingDevice.idmac}`,
         action: 'LOGIN',

@@ -2,7 +2,7 @@ import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 import { DeviceDto } from '../../device/dto/device.dto';
 
 export class LoginDto {
-  @IsEmail()
+  @IsString()
   email: string;
 
   @IsNotEmpty()

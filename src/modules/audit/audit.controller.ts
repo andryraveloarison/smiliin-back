@@ -7,7 +7,7 @@ export class AuditController {
   constructor(private readonly auditService: AuditService) {}
 
   @Get('getOne/:idAudit')
-      getOneById(@Param('idAudit') idAudit: string) {
+  getOneById(@Param('idAudit') idAudit: string){
         return this.auditService.getOneById(idAudit);
   }
 
