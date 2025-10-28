@@ -15,6 +15,9 @@ export class User {
   code: string;
 
   @Prop()
+  pseudo: string;
+
+  @Prop()
   logo: string;
 
   @Prop()

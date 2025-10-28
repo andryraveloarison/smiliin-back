@@ -20,9 +20,9 @@ export class AuthService {
     @InjectModel(RefreshToken.name) private refreshTokenModel: Model<RefreshTokenDocument>,
   ) {}
 
-  async validateUser(name: string, code: string) {
+  async validateUser(pseudo: string, code: string) {
     const users = await this.userService.findAll();
-    const user = users.find(u => u.name === name);
+    const user = users.find(u => u.pseudo === pseudo);
     if (!user) return null;
 
     const isPasswordValid = await bcrypt.compare(code, user.code);
@@ -31,9 +31,9 @@ export class AuthService {
     return user;
   }
 
-  async generateTokens(userId: string, name: string, role: string, deviceId: string) {
+  async generateTokens(userId: string, pseudo: string, role: string, deviceId: string) {
     const [accessToken, refreshToken] = await Promise.all([
-      this.generateAccessToken(userId, name, role, deviceId),
+      this.generateAccessToken(userId, pseudo, role, deviceId),
       this.generateRefreshToken(userId),
     ]);
 
@@ -43,8 +43,8 @@ export class AuthService {
     };
   }
 
-  private async generateAccessToken(userId: string, name: string, role: string, deviceId: string): Promise<string> {
-    const payload = { id: userId, name, role, deviceId };
+  private async generateAccessToken(userId: string, pseudo: string, role: string, deviceId: string): Promise<string> {
+    const payload = { id: userId, pseudo, role, deviceId };
     return this.jwtService.sign(payload, {
       expiresIn: '24h', // courte durée pour l'access token
     });
@@ -70,9 +70,9 @@ export class AuthService {
     return token;
   }
 
-  async login(name: string, code: string, deviceInfo: DeviceDto) {
+  async login(pseudo: string, code: string, deviceInfo: DeviceDto) {
 
-    const user = await this.validateUser(name, code);
+    const user = await this.validateUser(pseudo, code);
 
     if (!user) throw new UnauthorizedException('Invalid credentials');
 
@@ -114,7 +114,7 @@ export class AuthService {
 
     let deviceId = existingDevice ? existingDevice.id: deviceInfo.idmac;
 
-    const tokens = await this.generateTokens(user.id, user.name, user.role, deviceId );
+    const tokens = await this.generateTokens(user.id, user.pseudo, user.role, deviceId );
     return {
       ...tokens,
       success: true,
@@ -143,7 +143,7 @@ export class AuthService {
       }
 
       // Générer un nouveau access token
-      const accessToken = await this.generateAccessToken(user.id, user.name, user.role, decoded.deviceId);
+      const accessToken = await this.generateAccessToken(user.id, user.pseudo, user.role, decoded.deviceId);
 
       return {
         access_token: accessToken,

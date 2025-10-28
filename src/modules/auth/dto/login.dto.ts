@@ -3,7 +3,7 @@ import { DeviceDto } from '../../device/dto/device.dto';
 
 export class LoginDto {
   @IsString()
-  name: string;
+  pseudo: string;
 
   @IsNotEmpty()
   @IsString()

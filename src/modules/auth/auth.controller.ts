@@ -16,8 +16,8 @@ export class AuthController {
   @Post('login')
   async login(@Body() dto: LoginDto) {
     
-    console.log('Login attempt with name:', dto.name);
-    const user = await this.authService.login(dto.name, dto.code, dto.device);
+    console.log('Login attempt with name:', dto.pseudo);
+    const user = await this.authService.login(dto.pseudo, dto.code, dto.device);
     return user;
   }
 
