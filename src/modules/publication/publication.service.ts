@@ -187,20 +187,20 @@ async update(id: string, dto: UpdatePublicationDto, updatedBy: any): Promise<Pub
 
 
   async delete(id: string,deletedBy: any): Promise<{ deleted: boolean, id: string }> {
+
+      await this.auditEmitter.createAndNotify({
+        userId: deletedBy.id,
+        entity: 'Publication',
+        idObject: id,
+        deviceId: deletedBy.deviceId,
+        receiverIds: [deletedBy.id, "0"],
+        message: `Publication modifie par ${deletedBy.pseudo}`,
+        action: 'DELETE',
+      })
+
       const result = await this.pubModel.findByIdAndDelete(id).exec();
-      if (!result) throw new NotFoundException(`Publication with id ${id} not found`);
 
-      
-        await this.auditEmitter.createAndNotify({
-          userId: deletedBy.id,
-          entity: 'Publication',
-          idObject: id,
-          deviceId: deletedBy.deviceId,
-          receiverIds: [deletedBy.id, "0"],
-          message: `Publication modifie par ${deletedBy.pseudo}`,
-          action: 'DELETE',
-        })
-
+      if (!result) throw new NotFoundException(`Publication with id ${id} not found`); 
       
     return { deleted: true , id};
   }

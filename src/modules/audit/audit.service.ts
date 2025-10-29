@@ -3,23 +3,54 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Audit, AuditDocument, AuditEntity } from './schema/audit-log.schema';
 import { AuditAction } from './audit-emitter.service';
+import { Device } from '../device/schemas/device.schema';
+import { DeviceService } from '../device/device.service';
 
 
 @Injectable()
 export class AuditService {
   constructor(
     @InjectModel(Audit.name) private readonly auditModel: Model<AuditDocument>,
+       private readonly deviceService: DeviceService,
+    
   ) {}
 
-  async listByEntityAndObject(entity: AuditEntity, idObject: string) {
+ async listByEntityAndObject(entity: AuditEntity, idObject: string) {
     if (!Types.ObjectId.isValid(idObject)) {
       throw new BadRequestException('Invalid idObject');
     }
 
-    return this.auditModel
-      .find({ entity, idObject: new Types.ObjectId(idObject) })
-      .sort({ createdAt: -1 })
-      .exec();
+    // 🔍 On utilise aggregation pour joindre avec la collection devices
+    const audits = await this.auditModel.aggregate([
+      {
+        $match: {
+          entity,
+          idObject: new Types.ObjectId(idObject),
+        },
+      },
+      {
+        $lookup: {
+          from: 'devices', // nom de la collection MongoDB
+          localField: 'idmac', // champ dans Audit
+          foreignField: 'idmac', // champ dans Device
+          as: 'deviceInfo',
+        },
+      },
+      { $unwind: { path: '$deviceInfo', preserveNullAndEmptyArrays: true } },
+      {
+        $addFields: {
+          pseudo: '$deviceInfo.pseudo',
+        },
+      },
+      { $sort: { createdAt: -1 } },
+      {
+        $project: {
+          deviceInfo: 0, // on masque l’objet complet
+        },
+      },
+    ]);
+
+    return audits;
   }
 
   async createAudit(input: {
