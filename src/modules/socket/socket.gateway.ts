@@ -49,6 +49,7 @@ import {
         this.server.emit(channel, {
           auditId: payload.auditId,
           message: payload.message,
+          receiverIds: payload.receiverIds
         });
     }
   }
