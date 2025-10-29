@@ -135,13 +135,18 @@ export class BudgetService {
   async getBudgetsByPageAndMonth(pageId: string, month: string) {
     const pageObjId = new Types.ObjectId(pageId);
 
+    console.log("FETCH")
+
     const pageBudgets = await this.pageBudgetModel.find({ pageId: pageObjId, month }).exec();
     const postBudgets = await this.postBudgetModel
       .find({ pageId: pageObjId, month })
       .populate('postId', 'title userId status') // récupère le titre et le user de la publication
       .exec();
 
-  
+
+      console.log("FETCH 2")
+
+
     const globalBudget = await this.globalBudgetModel.findOne({ pageId: pageObjId, month }).exec();
 
     // Calcul des totaux
