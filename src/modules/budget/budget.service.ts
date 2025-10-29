@@ -138,7 +138,7 @@ export class BudgetService {
     const pageBudgets = await this.pageBudgetModel.find({ pageId: pageObjId, month }).exec();
     const postBudgets = await this.postBudgetModel
       .find({ pageId: pageObjId, month })
-      .populate('postId', 'title userId') // récupère le titre et le user de la publication
+      .populate('postId', 'title userId status') // récupère le titre et le user de la publication
       .exec();
 
   
