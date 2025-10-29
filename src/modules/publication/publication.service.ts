@@ -36,7 +36,7 @@ export class PublicationService {
           entity: 'Publication',
           idObject: newPubs._id.toString(),
           deviceId: createdBy.deviceId,
-          receiverIds: [createdBy.id, "0"],
+          receiverIds: [dto.userId, "0"],
           message: `Publication creer par ${createdBy.pseudo}`,
           action: 'CREATE',
         })
