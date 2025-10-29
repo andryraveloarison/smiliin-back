@@ -22,7 +22,7 @@ export class Publication {
   images?: string[];
 
   @Prop({
-    enum: ['En attente', 'Publié', 'En cours', 'Annulé', 'Terminé'],
+    enum: ['En attente', 'Publié', 'En cours', 'Annulé', 'Terminé', 'deteleted'],
     default: 'En attente',
   })
   status: string;

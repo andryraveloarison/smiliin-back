@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Publication, PublicationDocument } from './schema/publication.schema';
@@ -185,26 +185,39 @@ async update(id: string, dto: UpdatePublicationDto, updatedBy: any): Promise<Pub
 }
 
 
-
-  async delete(id: string,deletedBy: any): Promise<{ deleted: boolean, id: string }> {
-
-      console.log("delete: ", id)
-      await this.auditEmitter.createAndNotify({
-        userId: deletedBy.id,
-        entity: 'Publication',
-        idObject: id,
-        deviceId: deletedBy.deviceId,
-        receiverIds: [deletedBy.id, "0"],
-        message: `Publication modifie par ${deletedBy.pseudo}`,
-        action: 'DELETE',
-      })
-
-      const result = await this.pubModel.findByIdAndDelete(id).exec();
-
-      if (!result) throw new NotFoundException(`Publication with id ${id} not found`); 
-      
-    return { deleted: true , id};
+async delete(id: string, deletedBy: any): Promise<{ deleted: boolean; id: string }> {
+  // Vérifie la validité de l’ObjectId
+  if (!Types.ObjectId.isValid(id)) {
+    throw new BadRequestException(`Invalid publication id: ${id}`);
   }
+
+  // 🔹 Mets simplement à jour le statut au lieu de supprimer
+  const result = await this.pubModel
+    .findByIdAndUpdate(
+      id,
+      { status: 'deleted' }, // ⚠️ corrige le mot “deteleted” dans ton enum
+      { new: true }
+    )
+    .exec();
+
+  if (!result) {
+    throw new NotFoundException(`Publication with id ${id} not found`);
+  }
+
+  // 🔹 Audit log
+  await this.auditEmitter.createAndNotify({
+    userId: deletedBy.id,
+    entity: 'Publication',
+    idObject: id,
+    deviceId: deletedBy.deviceId,
+    receiverIds: [deletedBy.id, '0'],
+    message: `Publication supprimée par ${deletedBy.pseudo}`,
+    action: 'DELETE',
+  });
+
+  return { deleted: true, id };
+}
+
 
 
   async findByUserMonthly(userId: string) {
