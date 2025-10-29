@@ -113,6 +113,11 @@ export class PublicationService {
   }
 
   async findOne(id: string): Promise<Publication> {
+    console.log('Finding publication with ID:', id);
+    
+    try{
+
+
     const pub = await this.pubModel.findById(id)
     .populate('userId', 'id name pseudo logo')
       .populate({
@@ -126,17 +131,16 @@ export class PublicationService {
         path: 'postBudget',
         select: 'isBoosted budget objectif depense boostPrice month pageId',
       })
-      .populate({
-        path: 'lastModified',
-        select: 'action createdAt',
-        populate: {
-          path: 'user',
-          select: 'pseudo name logo',
-        },
-      })
+
       .exec();
-    if (!pub) throw new NotFoundException(`Publication with id ${id} not found`);
+          if (!pub) throw new NotFoundException(`Publication with id ${id} not found`);
     return pub;
+
+          }catch(err){
+      console.error('Error in findOne:', err?.message, err);
+      throw new InternalServerErrorException(err?.message || 'Error fetching publication');
+    }
+
   }
 
 

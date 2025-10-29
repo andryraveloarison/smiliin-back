@@ -55,15 +55,6 @@ PublicationSchema.virtual('publicationIdeas', {
   justOne: true, // ⚡ une publication n’a qu’un seul PublicationIdea
 });
 
-// Virtual lastModified
-PublicationSchema.virtual('lastModified', {
-  ref: 'AuditLog',
-  localField: '_id',
-  foreignField: 'entityId',
-  justOne: true,
-  options: { sort: { createdAt: -1 } }, // prend la dernière modification
-});
-
 // JSON clean
 PublicationSchema.set('toJSON', {
   virtuals: true,
