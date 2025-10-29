@@ -3,6 +3,7 @@
 /node_modules
 /build
 /src/main.ts
+/src/app.module.ts
 
 # Logs
 logs
