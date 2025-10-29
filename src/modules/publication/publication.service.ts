@@ -21,7 +21,7 @@ export class PublicationService {
       const newPubs = await newPub.save()
 
       const pub = await this.pubModel.findById(newPubs._id)
-      .populate('userId', 'id name email logo')
+      .populate('userId', 'id name pseudo logo')
         .populate({
           path: 'publicationIdeas',
           populate: {
@@ -37,7 +37,7 @@ export class PublicationService {
           idObject: newPubs._id.toString(),
           deviceId: createdBy.deviceId,
           receiverIds: [createdBy.id, "0"],
-          message: `Publication creer par ${createdBy.email}`,
+          message: `Publication creer par ${createdBy.pseudo}`,
           action: 'CREATE',
         })
 
@@ -47,7 +47,7 @@ export class PublicationService {
 
  // async findAll(): Promise<Publication[]> {
  //   return this.pubModel.find()
- //   .populate('userId', 'id name email logo')
+ //   .populate('userId', 'id name pseudo logo')
  //   .populate({
  //     path: 'publicationIdeas',
  //     populate: {
@@ -63,7 +63,7 @@ export class PublicationService {
  //     select: 'action createdAt',
  //     populate: {
  //       path: 'user',          
- //       select: 'email name logo',  
+ //       select: 'pseudo name logo',  
  //     },
  //   }).exec();
  // }
@@ -78,7 +78,7 @@ export class PublicationService {
         // 1) Auteur
         .populate({
           path: 'userId',
-          select: 'name email logo',        // pas besoin de 'id' ici
+          select: 'name pseudo logo',        // pas besoin de 'id' ici
           model: 'User',                    // ensure: MongooseModule.forFeature([{ name: 'User', schema: UserSchema }])
         })
         // 2) Idées de la publication (container)
@@ -114,7 +114,7 @@ export class PublicationService {
 
   async findOne(id: string): Promise<Publication> {
     const pub = await this.pubModel.findById(id)
-    .populate('userId', 'id name email logo')
+    .populate('userId', 'id name pseudo logo')
       .populate({
         path: 'publicationIdeas',
         populate: {
@@ -131,7 +131,7 @@ export class PublicationService {
         select: 'action createdAt',
         populate: {
           path: 'user',
-          select: 'email name logo',
+          select: 'pseudo name logo',
         },
       })
       .exec();
@@ -172,7 +172,7 @@ async update(id: string, dto: UpdatePublicationDto, updatedBy: any): Promise<Pub
     idObject: id,
     deviceId: updatedBy.deviceId,
     receiverIds: [updatedBy.id, "0"],
-    message: `Publication modifiée par ${updatedBy.email}`,
+    message: `Publication modifiée par ${updatedBy.pseudo}`,
     action: 'UPDATE',
     modif: modifAfter, 
   });
@@ -193,7 +193,7 @@ async update(id: string, dto: UpdatePublicationDto, updatedBy: any): Promise<Pub
           idObject: id,
           deviceId: deletedBy.deviceId,
           receiverIds: [deletedBy.id, "0"],
-          message: `Publication modifie par ${deletedBy.email}`,
+          message: `Publication modifie par ${deletedBy.pseudo}`,
           action: 'DELETE',
         })
 
