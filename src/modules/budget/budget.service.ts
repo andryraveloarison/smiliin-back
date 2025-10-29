@@ -59,7 +59,7 @@ export class BudgetService {
       pageId: new Types.ObjectId(data.pageId),
     });
 
-    const newBudget = await (await budget.save()).populate('postId', 'title userId')
+    const newBudget = await (await budget.save()).populate('postId', 'title userId status')
 
     this.socketGateway.emitSocket('budgetPost',{
       id: newBudget._id.toString(),
@@ -80,7 +80,7 @@ export class BudgetService {
       id: id,
       action: 'update'});
 
-    return this.postBudgetModel.findByIdAndUpdate(id, data, { new: true }).populate('postId', 'title userId').exec();
+    return this.postBudgetModel.findByIdAndUpdate(id, data, { new: true }).populate('postId', 'title userId status').exec();
   }
 
 
@@ -135,16 +135,11 @@ export class BudgetService {
   async getBudgetsByPageAndMonth(pageId: string, month: string) {
     const pageObjId = new Types.ObjectId(pageId);
 
-    console.log("FETCH")
-
     const pageBudgets = await this.pageBudgetModel.find({ pageId: pageObjId, month }).exec();
     const postBudgets = await this.postBudgetModel
       .find({ pageId: pageObjId, month })
       .populate('postId', 'title userId status') // récupère le titre et le user de la publication
       .exec();
-
-
-      console.log("FETCH 2")
 
 
     const globalBudget = await this.globalBudgetModel.findOne({ pageId: pageObjId, month }).exec();
