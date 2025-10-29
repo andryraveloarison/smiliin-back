@@ -188,6 +188,7 @@ async update(id: string, dto: UpdatePublicationDto, updatedBy: any): Promise<Pub
 
   async delete(id: string,deletedBy: any): Promise<{ deleted: boolean, id: string }> {
 
+      console.log("delete: ", id)
       await this.auditEmitter.createAndNotify({
         userId: deletedBy.id,
         entity: 'Publication',
