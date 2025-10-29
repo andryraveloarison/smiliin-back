@@ -46,12 +46,10 @@ import {
 
     emitAudit(channel: string, payload: { receiverIds: string[]; auditId: string; message: string }) {
       // Exemple 1: broadcast ciblé aux receveurs (rooms = userId)
-      payload.receiverIds.forEach((rid) => {
-        this.server.to(rid).emit(channel, {
+        this.server.emit(channel, {
           auditId: payload.auditId,
           message: payload.message,
         });
-      });
     }
   }
   
