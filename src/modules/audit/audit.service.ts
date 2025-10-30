@@ -94,7 +94,6 @@ export class AuditService {
       }
     return audit;
     }catch (error) {
-      console.error('Error fetching audit by ID:', error);
       throw new NotFoundException(error.message);
     }
     
