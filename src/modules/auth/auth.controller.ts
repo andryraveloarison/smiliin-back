@@ -5,6 +5,7 @@ import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { Request } from 'express';
 import { UserService } from '../user/user.service';
+import { LogoutDto } from './dto/logout.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -18,6 +19,8 @@ export class AuthController {
     const user = await this.authService.login(dto.pseudo, dto.code, dto.device);
     return user;
   }
+
+
 
   @UseGuards(JwtAuthGuard)
   @Get('me')
@@ -34,9 +37,8 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Post('logout')
-  async logout(@Req() request: Request, @Body() { refresh_token }: RefreshTokenDto) {
-    await this.authService.revokeRefreshToken((request.user as any).id, refresh_token);
-    return { success: true };
+  async logout(@Req() request: Request, @Body()  dto: LogoutDto ) {
+    return await this.authService.logout((request.user as any).id, dto.refreshToken, dto.device);
   }
   
 }

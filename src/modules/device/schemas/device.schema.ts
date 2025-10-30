@@ -31,6 +31,10 @@ export class Device {
 
   @Prop({ required: false , default: ""})
   userRole?: string;
+
+  @Prop({ default: true})
+  isConnected?: boolean;
+
 }
 
 export const DeviceSchema = SchemaFactory.createForClass(Device);

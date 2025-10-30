@@ -121,6 +121,33 @@ export class AuthService {
     };
   }
 
+
+  async logout(userId: string, refreshToken: string, deviceInfo: DeviceDto) {
+  // 1️⃣ Révoquer le refresh token
+  await this.revokeRefreshToken(userId, refreshToken);
+
+  let device = await this.deviceService.findByIdMacAndUserId(deviceInfo.idmac, userId);
+
+  if (device) {
+    await this.deviceService.updateConnectionStatus(device.id, false);
+  }
+
+  // 3️⃣ Émettre un audit de déconnexion
+  await this.auditEmitter.createAndNotify({
+    userId,
+    entity: 'Auth',
+    idObject: device.id.toString(),
+    deviceId: device.id.toString(),
+    action: 'LOGOUT',
+    message: `Utilisateur déconnecté depuis le périphérique ${device?.pseudo || device?.idmac}`,
+    receiverIds: [userId, "0"], // tu peux inclure d'autres si besoin (ex: admins)
+  });
+
+  return { success: true, message: 'Déconnexion réussie' };
+}
+
+
+
   async refreshAccessToken(refreshToken: string) {
     try {
       // Vérifier si le refresh token existe et n'est pas révoqué
@@ -167,4 +194,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid or expired token');
     }
   }
+
+
+
 }

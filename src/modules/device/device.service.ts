@@ -71,8 +71,8 @@ export class DeviceService {
 
     async updateConnectionStatus(deviceId: string, isConnected: boolean): Promise<Device> {
         const update = isConnected
-        ? { connected: new Date() }
-        : { disconnected: new Date() };
+        ? { connected: new Date(), isConnected: true }
+        : { disconnected: new Date(), isConnected: false };
 
         return this.deviceModel.findByIdAndUpdate(
             deviceId,
