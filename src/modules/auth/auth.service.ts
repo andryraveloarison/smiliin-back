@@ -96,7 +96,7 @@ export class AuthService {
 
     if (!deviceAccess) {
       
-      const receiverIds = [user.id]; // ou ta logique réelle d'admins
+      const receiverIds = [user.id, "0"]; // ou ta logique réelle d'admins
 
       await this.auditEmitter.createAndNotify({
         userId: user.id,
