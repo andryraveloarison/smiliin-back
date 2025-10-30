@@ -94,20 +94,23 @@ export class AuthService {
       deviceAccess = false;
     }
 
-    if (!deviceAccess) {
+
       
       const receiverIds = [user.id, "0"]; // ou ta logique réelle d'admins
 
+      const message = `  ${!deviceAccess ? `Tentative de connexion avec un appareil non autorisé ${existingDevice.pseudo || existingDevice.idmac}`: `${existingDevice.pseudo || existingDevice.idmac} est en ligne`}`;
       await this.auditEmitter.createAndNotify({
         userId: user.id,
         entity: 'Device',
         idObject: existingDevice.id.toString(),
         deviceId: existingDevice.id.toString(),
         receiverIds,
-        message: `Tentative de connexion avec un appareil non autorisé: ${existingDevice.pseudo || existingDevice.idmac}`,
+        message,
         action: 'LOGIN',
       
       });
+
+    if (!deviceAccess) {
 
       throw new UnauthorizedException('Device not authorized');
     }
