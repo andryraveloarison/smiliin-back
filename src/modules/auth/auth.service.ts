@@ -135,7 +135,7 @@ export class AuthService {
   // 3️⃣ Émettre un audit de déconnexion
   await this.auditEmitter.createAndNotify({
     userId,
-    entity: 'Auth',
+    entity: 'Device',
     idObject: device.id.toString(),
     deviceId: device.id.toString(),
     action: 'LOGOUT',
