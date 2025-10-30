@@ -82,7 +82,9 @@ export class AuditService {
     if (!Types.ObjectId.isValid(id)) {
       throw new BadRequestException('Invalid audit ID');
     }
-    const audit = await this.auditModel
+
+    try {
+      const audit = await this.auditModel
     .findById(id)
     .populate({ path: 'idObject' }) // ⭐ auto en fonction de "entity" via refPath
     .exec();      
@@ -91,5 +93,9 @@ export class AuditService {
         throw new NotFoundException(`Audit with ID ${id} not found`);
       }
     return audit;
+    }catch (error) {
+      throw new NotFoundException(`Audit with ID ${id} not found`);
+    }
+    
   }
 }
