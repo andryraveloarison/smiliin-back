@@ -32,7 +32,7 @@ export class PublicationService {
         .exec();
 
         await this.auditEmitter.createAndNotify({
-          userId: createdBy.id,
+          userId: dto.userId,
           entity: 'Publication',
           idObject: newPubs._id.toString(),
           deviceId: createdBy.deviceId,
@@ -171,11 +171,11 @@ async update(id: string, dto: UpdatePublicationDto, updatedBy: any): Promise<Pub
   }
 
   await this.auditEmitter.createAndNotify({
-    userId: updatedBy.id,
+    userId: dto.userId,
     entity: 'Publication',
     idObject: id,
     deviceId: updatedBy.deviceId,
-    receiverIds: [updatedBy.id, "0"],
+    receiverIds: [dto.userId, "0"],
     message: `Publication modifiée par ${updatedBy.pseudo}`,
     action: 'UPDATE',
     modif: modifAfter, 
@@ -206,19 +206,17 @@ async delete(id: string, deletedBy: any): Promise<{ deleted: boolean; id: string
 
   // 🔹 Audit log
   await this.auditEmitter.createAndNotify({
-    userId: deletedBy.id,
+    userId: result.userId.toString(),
     entity: 'Publication',
     idObject: id,
     deviceId: deletedBy.deviceId,
-    receiverIds: [deletedBy.id, '0'],
+    receiverIds: [result.userId.toString(), '0'],
     message: `Publication supprimée par ${deletedBy.pseudo}`,
     action: 'DELETE',
   });
 
   return { deleted: true, id };
 }
-
-
 
   async findByUserMonthly(userId: string) {
   const now = new Date();

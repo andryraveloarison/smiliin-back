@@ -19,6 +19,7 @@ import {
 import { JwtAuthGuard } from 'src/guards/auth.guard';
 import { JwtPayload } from 'jsonwebtoken';
   
+
   @Controller('ideas')
   export class IdeaController {
     constructor(
@@ -48,7 +49,7 @@ import { JwtPayload } from 'jsonwebtoken';
         }
         data.images = urls;
       }
-      return this.ideaService.create(data, req.user.id);
+      return this.ideaService.create(data, req.user);
     }
   
     // READ all
@@ -85,7 +86,7 @@ import { JwtPayload } from 'jsonwebtoken';
         }
         data.images = urls;
       }
-      return this.ideaService.update(id, data, req.user.id);
+      return this.ideaService.update(id, data, req.user);
     }
   
     // DELETE
@@ -97,7 +98,7 @@ import { JwtPayload } from 'jsonwebtoken';
     
     ) {
 
-      return this.ideaService.remove(id, req.user.id);
+      return this.ideaService.remove(id, req.user);
     }
 
   

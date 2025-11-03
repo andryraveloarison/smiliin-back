@@ -16,8 +16,8 @@ import {
   import { CreatePublicationDto } from './dto/create-publication.dto';
   import { UpdatePublicationDto } from './dto/update-publication.dto';
   import { FileService } from '../../utils/file.service';
-import { JwtAuthGuard } from 'src/guards/auth.guard';
-import { JwtPayload } from 'jsonwebtoken';
+  import { JwtAuthGuard } from 'src/guards/auth.guard';
+  import { JwtPayload } from 'jsonwebtoken';
 
   @UseGuards(JwtAuthGuard) // ✅ Protection par token
 
@@ -36,7 +36,6 @@ import { JwtPayload } from 'jsonwebtoken';
       @Body() dto: CreatePublicationDto,
       @Req() req: Request & { user: JwtPayload },
       @UploadedFiles() files?: { images?: Express.Multer.File[] },
-
     ) {
       if (files?.images) {
         const urls: string[] = [];
@@ -82,7 +81,6 @@ import { JwtPayload } from 'jsonwebtoken';
         }
         dto.images = urls;
       }
-
       return this.pubService.update(id, dto, req.user);
     }
     
@@ -111,6 +109,5 @@ import { JwtPayload } from 'jsonwebtoken';
       const publications = await this.pubService.findByUserAndMonth(userId, +year, +month);
       return {publications };
     }
-
   }
   

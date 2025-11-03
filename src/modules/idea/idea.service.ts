@@ -2,17 +2,16 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Idea, IdeaDocument } from './schema/idea.schema';
-import { SocketGateway } from '../socket/socket.gateway';
+import { AuditEmitterService } from '../audit/audit-emitter.service';
 
 @Injectable()
 export class IdeaService {
   constructor(
     @InjectModel(Idea.name) private ideaModel: Model<IdeaDocument>,
-    private readonly socketGateway: SocketGateway,
-  
+    private readonly auditEmitter: AuditEmitterService,  
   ) {}
 
-  async create(data: Partial<Idea>, createBy?: string): Promise<Idea> {
+  async create(data: Partial<Idea>, createdBy: any): Promise<Idea> {
     const idea = new this.ideaModel(data);
     const ideaSaved = await idea.save()
 
@@ -22,10 +21,15 @@ export class IdeaService {
     .populate('userId', 'id name logo email')
     .exec();
 
-    this.socketGateway.emitSocket('Idea',{
-      id: ideaReturn._id.toString(),
-      userId: createBy,
-      action:'create'});
+    await this.auditEmitter.createAndNotify({
+      userId: data.userId.toString(),
+      entity: 'Idea',
+      idObject: ideaReturn._id.toString(),
+      deviceId: createdBy.deviceId,
+      receiverIds: [data.userId.toString(), "0"],
+      message: ``,
+      action: 'CREATE',
+    })
     
     return ideaReturn;
   }
@@ -49,34 +53,68 @@ export class IdeaService {
     return idea;
   }
 
-  async update(id: string, data: any, updateBy?: string): Promise<Idea> {
+  async update(id: string, data: any, updatedBy: any): Promise<Idea> {
 
-    const idea = await this.ideaModel
+    // 1) récupérer l'ancien document
+    const before = await this.ideaModel.findById(id).lean().exec();
+    if (!before) throw new NotFoundException(`Idea with id ${id} not found`);
+
+    const updated = await this.ideaModel
       .findByIdAndUpdate(id, data, { new: true })
       .populate('category')
       .populate('userId', 'id name logo email')
       .exec();
 
-    if (!idea) throw new NotFoundException('Idea not found');
+    if (!updated) throw new NotFoundException('Idea not found');
 
-    this.socketGateway.emitSocket('Idea',{
-      id,
-      userId: updateBy,
-      action:'update'});
+    const modifAfter: Record<string, any> = {};
+    const dtoKeys = Object.keys(data ?? {});
 
-    return idea;
+    for (const key of dtoKeys) {
+      const beforeVal = (before as any)[key];
+      const afterVal = (updated as any)[key];
+
+      const changed = JSON.stringify(beforeVal) !== JSON.stringify(afterVal);
+      if (changed) {
+        modifAfter[key] = afterVal;
+      }
+    }
+
+      await this.auditEmitter.createAndNotify({
+        userId: updated.userId.toString(),
+        entity: 'Idea',
+        idObject: id,
+        deviceId: updatedBy.deviceId,
+        receiverIds: [updated.userId.toString(), "0"],
+        message: ``,
+        action: 'UPDATE',
+        modif: modifAfter, 
+      });
+
+
+    return updated;
   }
 
-  async remove(id: string, deleteBy: string): Promise<{deleted: boolean, id: string}> {
+  async remove(id: string, deletedBy: any): Promise<{deleted: boolean, id: string}> {
 
-    const result = await this.ideaModel.findByIdAndDelete(id).exec();
-
-    this.socketGateway.emitSocket('Idea',{
-      id,
-      userId: deleteBy,
-      action:'delete'});
-
+    const result = await this.ideaModel.findById(id).exec();
     if (!result) throw new NotFoundException('Idea not found');
+
+
+      // 🔹 Audit log
+    await this.auditEmitter.createAndNotify({
+      userId: result.userId.toString(),
+      entity: 'Idea',
+      idObject: id,
+      deviceId: deletedBy.deviceId,
+      receiverIds: [result.userId.toString(), '0'],
+      message: ``,
+      action: 'DELETE',
+    });
+
+
+    await this.ideaModel.findByIdAndDelete(id).exec();
+
 
     return { deleted: true , id};
 

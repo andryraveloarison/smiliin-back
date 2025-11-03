@@ -149,8 +149,6 @@ export class AuthService {
   return { success: true, message: 'Déconnexion réussie' };
 }
 
-
-
   async refreshAccessToken(refreshToken: string) {
     try {
       // Vérifier si le refresh token existe et n'est pas révoqué
