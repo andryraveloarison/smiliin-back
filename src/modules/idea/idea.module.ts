@@ -7,9 +7,14 @@ import { IdeaController } from './idea.controller';
 import { FileService } from 'src/utils/file.service';
 import { AuthModule } from '../auth/auth.module';
 import { SocketGateway } from '../socket/socket.gateway';
+import { AuditModule } from '../audit/audit.module';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: Idea.name, schema: IdeaSchema }]), AuthModule],
+  imports: [
+    MongooseModule.forFeature([{ name: Idea.name, schema: IdeaSchema }]), 
+    AuthModule,
+    AuditModule
+  ],
   providers: [IdeaService, FileService, SocketGateway],
   controllers: [IdeaController],
 })
