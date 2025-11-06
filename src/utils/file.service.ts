@@ -32,6 +32,7 @@ export class FileService {
       mime.lookup(fileName) || 'application/octet-stream';
     console.log(`➡️ Uploading ${fileName} with contentType: ${contentType}`);
 
+    try {
     const { error } = await this.supabase.storage
       .from('smiliin')
       .upload(filePath, fileBuffer, {
@@ -40,13 +41,22 @@ export class FileService {
         contentType, // ✅ fix pour PDF
       });
 
-    if (error) {
+      if (error) {
       throw new Error(`Supabase upload failed: ${error.message}`);
     }
+
+    } catch (error) {
+      console.error('❌ Supabase upload error:', error);
+      throw error;
+    }
+
+
 
     const { data } = this.supabase.storage
       .from('smiliin')
       .getPublicUrl(filePath);
+
+    console.log(`✅ File uploaded to: ${data.publicUrl}`);
 
     return data.publicUrl;
   }
