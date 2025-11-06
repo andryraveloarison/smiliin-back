@@ -72,7 +72,13 @@ export class AuthService {
 
   async login(pseudo: string, code: string, deviceInfo: DeviceDto) {
 
+        console.log("********************************")
+    console.log("VALIDATION USER")
+
     const user = await this.validateUser(pseudo, code);
+
+    console.log("********************************")
+    console.log(user)
 
     if (!user) throw new UnauthorizedException('Invalid credentials');
 
@@ -92,10 +98,7 @@ export class AuthService {
       await this.deviceService.createDevice(user.id, deviceInfo);
       existingDevice = await this.deviceService.findByIdMacAndUserId(deviceInfo.idmac, user.id);
       deviceAccess = true;
-    }
-
-
-      
+    }      
       const receiverIds = [user.id, "0"]; // ou ta logique réelle d'admins
 
       const message = `  ${!deviceAccess ? `Tentative de connexion avec un appareil non autorisé ${existingDevice.pseudo || existingDevice.idmac}`: `${existingDevice.pseudo || existingDevice.idmac} est en ligne`}`;
