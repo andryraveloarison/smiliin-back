@@ -72,6 +72,7 @@ export class AuthService {
 
   async login(pseudo: string, code: string, deviceInfo: DeviceDto) {
 
+    console.log(deviceInfo)
         console.log("********************************")
     console.log("VALIDATION USER")
 
