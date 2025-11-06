@@ -4,18 +4,16 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { v4 as uuidv4 } from 'uuid';
 import * as mime from 'mime-types';
 
-type Folder = 'logo' | 'idea' | 'post' | 'descente'| 'insight';
+type Folder = 'logo' | 'idea' | 'post' | 'descente'| 'insight';;
 
 @Injectable()
 export class FileService {
   private supabase: SupabaseClient;
 
   constructor() {
-    this.supabase = createClient( 
-      'https://iqiblpyxxvptaepjylqo.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlxaWJscHl4eHZwdGFlcGp5bHFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzODA3MzksImV4cCI6MjA3Nzk1NjczOX0.vMo5Pb8nhQTc9rcaOx4Yfzq5FQKPVVpvMRp1g76MNx4'
-      // process.env.SUPABASE_URL || 'https://rlmdnigvpmtycwfbzlvp.supabase.co/',
-      // process.env.SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsbWRuaWd2cG10eWN3ZmJ6bHZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY2NTA0NDQsImV4cCI6MjA2MjIyNjQ0NH0.Psf5lpshwEdi5SveURDFQ9WsgCdCjIZGhYM8ajzoQ2Q',
+    this.supabase = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_KEY,
     );
   }
 
@@ -32,7 +30,6 @@ export class FileService {
       mime.lookup(fileName) || 'application/octet-stream';
     console.log(`➡️ Uploading ${fileName} with contentType: ${contentType}`);
 
-    try {
     const { error } = await this.supabase.storage
       .from('smiliin')
       .upload(filePath, fileBuffer, {
@@ -41,22 +38,13 @@ export class FileService {
         contentType, // ✅ fix pour PDF
       });
 
-      if (error) {
+    if (error) {
       throw new Error(`Supabase upload failed: ${error.message}`);
     }
-
-    } catch (error) {
-      console.error('❌ Supabase upload error:', error);
-      throw error;
-    }
-
-
 
     const { data } = this.supabase.storage
       .from('smiliin')
       .getPublicUrl(filePath);
-
-    console.log(`✅ File uploaded to: ${data.publicUrl}`);
 
     return data.publicUrl;
   }
