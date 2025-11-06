@@ -105,6 +105,7 @@ export class IdeaService {
 
       // 🔹 Supprimer le fichier associé si existe
     if (result.images) { // ou result.imageUrl selon ton schema
+      console.log(result.images)
       for(const imageUrl of result.images) {
         await this.fileService.deleteFile(imageUrl);
       }

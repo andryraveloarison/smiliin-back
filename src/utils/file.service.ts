@@ -55,6 +55,7 @@ export class FileService {
     const url = new URL(fileUrl);
     const filePath = url.pathname.replace(/^\/storage\/v1\/object\/public\/smiliin\//, '');
 
+    console.log(`➡️ Deleting file at path: ${filePath}`);
     const { error } = await this.supabase.storage
       .from('smiliin')
       .remove([filePath]);
