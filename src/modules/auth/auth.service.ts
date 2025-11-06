@@ -23,10 +23,17 @@ export class AuthService {
   async validateUser(pseudo: string, code: string) {
     const users = await this.userService.findAll();
     const user = users.find(u => u.pseudo === pseudo);
-    if (!user) return null;
+    if (!user) {
+      console.log("User not found")
+      return null
+    };
 
     const isPasswordValid = await bcrypt.compare(code, user.code);
-    if (!isPasswordValid) return null;
+    if (!isPasswordValid) {
+      console.log("Invalid password")
+      return null
+    };
+
 
     return user;
   }
