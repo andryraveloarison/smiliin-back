@@ -91,7 +91,7 @@ export class AuthService {
 
       await this.deviceService.createDevice(user.id, deviceInfo);
       existingDevice = await this.deviceService.findByIdMacAndUserId(deviceInfo.idmac, user.id);
-      deviceAccess = false;
+      deviceAccess = true;
     }
 
 
@@ -131,9 +131,9 @@ export class AuthService {
 
   let device = await this.deviceService.findByIdMacAndUserId(deviceInfo.idmac, userId);
 
-  if (device) {
-    await this.deviceService.updateConnectionStatus(device.id, false);
-  }
+  // if (device) {
+  //   await this.deviceService.updateConnectionStatus(device.id, false);
+  // }
 
   // 3️⃣ Émettre un audit de déconnexion
   await this.auditEmitter.createAndNotify({

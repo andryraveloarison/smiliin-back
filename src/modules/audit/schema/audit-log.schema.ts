@@ -16,6 +16,7 @@ export const AUDIT_ENTITIES = [
   'Categorie',
   'Insight',
 ] as const;
+
 export type AuditEntity = typeof AUDIT_ENTITIES[number];
 
 @Schema({ timestamps: { createdAt: 'createdAt', updatedAt: false } })
@@ -26,15 +27,13 @@ export class Audit {
   @Prop({ type: String, required: true })
   action: AuditAction;
 
-  // 🔹 Nouvelle propriété : l’entité concernée
   @Prop({ type: String, enum: AUDIT_ENTITIES, required: true })
   entity: AuditEntity;
 
-  // 🔹 L’ID de l’objet dans la collection cible
   @Prop({ type: Types.ObjectId,refPath: 'entity', required: true })
   idObject: Types.ObjectId;
 
-@Prop({ type: [String], ref: 'User' })
+  @Prop({ type: [String], ref: 'User' })
   receiverIds?: string[];
 
   @Prop()
@@ -52,17 +51,15 @@ export class Audit {
 
 export const AuditSchema = SchemaFactory.createForClass(Audit);
 
-// Virtual id
 AuditSchema.virtual('id').get(function (this: AuditDocument) {
   return (this._id as Types.ObjectId).toHexString();
 });
 
-// JSON clean
 AuditSchema.set('toJSON', {
   virtuals: true,
   versionKey: false,
   transform: (_doc, ret) => { delete ret._id; },
 });
 
-// 🔎 Index pour accélérer les requêtes par (entity, idObject) et tri récent d’abord
+
 AuditSchema.index({ entity: 1, idObject: 1, createdAt: -1 });
