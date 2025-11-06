@@ -3,12 +3,15 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Idea, IdeaDocument } from './schema/idea.schema';
 import { AuditEmitterService } from '../audit/audit-emitter.service';
+  import { FileService } from '../../utils/file.service';
 
 @Injectable()
 export class IdeaService {
   constructor(
     @InjectModel(Idea.name) private ideaModel: Model<IdeaDocument>,
-    private readonly auditEmitter: AuditEmitterService,  
+    private readonly auditEmitter: AuditEmitterService,
+    private readonly fileService: FileService,
+  
   ) {}
 
   async create(data: Partial<Idea>, createdBy: any): Promise<Idea> {
@@ -100,6 +103,12 @@ export class IdeaService {
     const result = await this.ideaModel.findById(id).exec();
     if (!result) throw new NotFoundException('Idea not found');
 
+      // 🔹 Supprimer le fichier associé si existe
+    if (result.images) { // ou result.imageUrl selon ton schema
+      for(const imageUrl of result.images) {
+        await this.fileService.deleteFile(imageUrl);
+      }
+    }
 
       // 🔹 Audit log
     await this.auditEmitter.createAndNotify({

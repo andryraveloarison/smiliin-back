@@ -48,4 +48,28 @@ export class FileService {
 
     return data.publicUrl;
   }
+
+  async deleteFile(fileUrl: string): Promise<boolean> {
+  try {
+    // Extraire le chemin relatif dans le bucket depuis l'URL publique
+    const url = new URL(fileUrl);
+    const filePath = url.pathname.replace(/^\/storage\/v1\/object\/public\/smiliin\//, '');
+
+    const { error } = await this.supabase.storage
+      .from('smiliin')
+      .remove([filePath]);
+
+    if (error) {
+      console.error('Supabase delete error:', error.message);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('Delete file failed:', err);
+    return false;
+  }
 }
+
+}
+
+
