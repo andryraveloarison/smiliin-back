@@ -53,8 +53,10 @@ export class FileService {
   try {
     // Extraire le chemin relatif dans le bucket depuis l'URL publique
     const url = new URL(fileUrl);
-    const filePath = url.pathname.replace(/^\/storage\/v1\/object\/public\/smiliin\//, '');
-
+    
+    const filePath = decodeURIComponent(
+      url.pathname.replace(/^\/storage\/v1\/object\/public\/smiliin\//, '')
+    );
     console.log(`➡️ Deleting file at path: ${filePath}`);
     const { error } = await this.supabase.storage
       .from('smiliin')
